@@ -1,6 +1,6 @@
-const setHead               = require('../templates/setHead.template'),
-	setEnd                  = require('../templates/setEnd.template'),
-	setReportContent        = require('../templates/setReportContent.template');
+const setHead               = require('../templates/setHead.template.ts'),
+	setEnd                  = require('../templates/setEnd.template.ts'),
+	setReportContent        = require('../templates/setReportContent.template.ts');
 
 
 class TemplateBuilder {
