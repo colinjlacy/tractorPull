@@ -100,7 +100,9 @@ function tractorPull(opts) {
 	        specsFailed: 0
         };
 
-        reporter.suites.forEach((suite) => {
+	    const suites = reporter.suites;
+
+	    Object.entries(suites).forEach(([id, suite]) => {
 	        if (suite.isPrinted || !validator.hasValidSpecs(suite)) {
 		        return;
 	        }
