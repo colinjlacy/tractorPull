@@ -1,9 +1,6 @@
-/**
- * setReportContent
- * @param data: {suites: Suite[], specs: number, specsPassed: number, specsFailed: number, isPrinted: boolean}
- * @returns {string}
-*/
-function setReportContent(data) {
+import { iTestResults } from '../interfaces/results';
+
+export function setReportContent(data: iTestResults) {
 	var tpl = "";
 	// loop through the suites
 	for (var suite = 0; suite < data.suites.length; suite++) {
@@ -51,5 +48,3 @@ function setReportContent(data) {
 
 	return tpl;
 }
-
-module.exports = setReportContent;

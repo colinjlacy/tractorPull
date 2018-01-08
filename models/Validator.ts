@@ -1,35 +1,36 @@
-const _ = require('lodash');
+import { Options } from './Options';
+import * as _ from 'lodash';
+import jasmine from 'jasmine';
 
+export class Validator {
 
-class Validator {
+	private opts: Options;
 
-	constructor(opts) {
+	constructor(opts: Options) {
 		this.opts = opts;
 	}
 
-	isSpecValid(spec) {
+	isSpecValid(spec: any) {
 		// Don't screenshot skipped specs
-		var isSkipped = this.opts.ignoreSkippedSpecs && spec.status === 'pending';
+		var isSkipped = this.opts.isIgnoreSkippedSpecs() && spec.status === 'pending';
 		// Screenshot only for failed specs
-		var isIgnored = this.opts.captureOnlyFailedSpecs && spec.status !== 'failed';
+		var isIgnored = this.opts.isCaptureOnlyFailedSpecs() && spec.status !== 'failed';
 
 		return !isSkipped && !isIgnored;
 	}
 
-	hasValidSpecs(suite) {
-		var validSuites = false;
-		var validSpecs = false;
+	hasValidSpecs(suite): boolean {
+		let validSuites: boolean = false;
+		let validSpecs: boolean = false;
 
 		if (suite._suites.length) {
-			validSuites = _.any(suite._suites, (s) => this.hasValidSpecs(s));
+			validSuites = suite._suites.some((s: jasmine.Suite): boolean => this.hasValidSpecs(s));
 		}
 
 		if (suite._specs.length) {
-			validSpecs = _.any(suite._specs, (s) => this.isSpecValid(s));
+			validSpecs = suite._specs.some((s: jasmine.Spec): boolean => this.isSpecValid(s));
 		}
 
-		return validSuites || validSpecs;
+		return !!validSuites || !!validSpecs;
 	}
 }
-
-module.exports = Validator;

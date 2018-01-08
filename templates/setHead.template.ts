@@ -1,11 +1,6 @@
-/**
- * setHead
- * @param date: string
- * @param dataObj: {suites: Suite[], specs: number, specsPassed: number, specsFailed: number, isPrinted: boolean}
- * @returns {string}
- */
+import { iTestResults } from '../interfaces/results';
 
-function setHead(date, dataObj) {
+export function setHead(date: string, dataObj: iTestResults) {
 	return '<!DOCTYPE html>' +
 		'<head>' +
 		'<title>' + date + '</title>' +
@@ -34,5 +29,3 @@ function setHead(date, dataObj) {
 		'</div>' +
 		'<hr/>';
 }
-
-module.exports = setHead;

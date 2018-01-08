@@ -1,41 +1,37 @@
-/**
- * Created by colinlacy on 3/20/15.
- */
 
-const fs                    = require('fs'),
-    mkdirp                  = require('mkdirp'),
-    _                       = require('lodash'),
-    path                    = require('path'),
-	hat                     = require('hat'),
-	Reporter                = require('./models/Reporter'),
-	Validator               = require('./models/Validator'),
-	TemplateBuilder         = require('./models/TemplateBuilder'),
-	FormattedDate           = require('./models/FormattedDate');
+import { Reporter } from './models/Reporter';
+import { TestResults } from './models/TestResults';
+import { SuiteResults } from './models/SuiteResults';
+import { FormattedDate } from './models/FormattedDate';
+import { TemplateBuilder } from './models/TemplateBuilder';
+import { Options } from './models/Options';
+import { Validator } from './models/Validator';
+import { iOptions } from './interfaces/options';
+import { browser, by, element } from 'protractor';
+import * as _ from 'lodash';
+import fs from 'fs';
+import jasmine from 'jasmine';
+import mkdirp from 'mkdirp';
+const hat = require('hat');
 
-function tractorPull(opts) {
+export function tractorPull(initialOptions: iOptions): jasmine.CustomReporter  {
 
-    // TODO: more options
-    opts                            = opts || {};
-    opts.dest                       = (opts.dest || './results/screenshots') + '/';
-    opts.filename                   = opts.filename || './results/report.html';
-    opts.ignoreSkippedSpecs         = opts.ignoreSkippedSpecs || false;
-    opts.captureOnlyFailedSpecs     = opts.captureOnlyFailedSpecs || false;
-
-	const reporter = new Reporter(opts);
+	const opts: Options = new Options(initialOptions);
+	const reporter: Reporter = new Reporter(opts);
 	const validator = new Validator(opts);
 
-	this.jasmineStarted = function() {
-        mkdirp(opts.dest, function(err) {
+	this.jasmineStarted = function(): void {
+        mkdirp(opts.getDest(), function(err): void {
             var files;
 
             if(err) {
-                throw new Error('Could not create directory ' + opts.dest);
+                throw new Error('Could not create directory ' + opts.getDest());
             }
 
-            files = fs.readdirSync(opts.dest);
+            files = fs.readdirSync(opts.getDest());
 
             files.forEach((file) => {
-                var filepath = opts.dest + file;
+                var filepath = opts.getDest() + file;
                 if (fs.statSync(filepath).isFile()) {
                     fs.unlinkSync(filepath);
                 }
@@ -43,40 +39,40 @@ function tractorPull(opts) {
         });
     };
 
-    this.suiteStarted = function(suite) {
+    this.suiteStarted = function(suite): void {
 	    suite = reporter.getSuiteClone(suite);
-	    suite._suites = [];
-        suite._specs = [];
+	    suite.suites = [];
+        suite.specs = [];
         suite._started = Date.now();
-        suite._parent = reporter.runningSuite;
+        suite._parent = reporter.getRunningSuite();
         suite.isPrinted = false;
 
-	    let runningSuite = reporter.runningSuite;
+	    let runningSuite = reporter.getRunningSuite();
 
 	    if (runningSuite) {
-	        runningSuite._suites.push(suite);
-	        reporter.runningSuite = runningSuite;
+	        runningSuite.suites().push(suite);
+	        reporter.setRunningSuite(runningSuite);
         }
 
-        reporter.runningSuite = suite;
+        reporter.setRunningSuite(runningSuite);
     };
 
-    this.suiteDone = function(suite) {
+    this.suiteDone = function(suite): void {
 	    suite = reporter.getSuiteClone(suite);
 	    suite._finished = Date.now();
-        reporter.runningSuite = suite._parent;
+        reporter.setRunningSuite(suite._parent);
     };
 
-    this.specStarted = function(spec) {
+    this.specStarted = function(spec): void {
 	    spec = reporter.getSpecClone(spec);
         spec._started = Date.now();
-        spec._suite = reporter.runningSuite;
-	    const runningSuite = reporter.runningSuite;
-	    runningSuite._specs.push(spec);
-	    reporter.runningSuite = runningSuite;
+        spec._suite = reporter.getRunningSuite();
+	    const runningSuite = reporter.getRunningSuite();
+	    runningSuite.specs().push(spec);
+	    reporter.setRunningSuite(runningSuite);
     };
 
-    this.specDone = function(spec) {
+    this.specDone = function(spec): void {
 	    spec = reporter.getSpecClone(spec);
         spec._finished = Date.now();
 
@@ -92,34 +88,25 @@ function tractorPull(opts) {
         });
     };
 
-    this.jasmineDone = function() {
-        var output = {
-	        suites: [],
-	        spects: 0,
-	        specsPassed: 0,
-	        specsFailed: 0
-        };
+    this.jasmineDone = function(): void {
+        var output: TestResults = new TestResults();
 
-	    const suites = reporter.suites;
+	    const suites = reporter.getSuites();
 
-	    Object.entries(suites).forEach(([id, suite]) => {
-	        if (suite.isPrinted || !validator.hasValidSpecs(suite)) {
+		(<any>Object).values(suites).forEach((suite: jasmine.Suite) => {
+	        if (!validator.hasValidSpecs(suite)) {
 		        return;
 	        }
-	        var suiteResults = reporter.printResults(suite);
-            output.suites.push(suiteResults);
-            output.specs += suite._specs.length;
-            output.specsPassed += suiteResults.specsPassed;
-            output.specsFailed += suiteResults.specsFailed;
-            suite.isPrinted = true;
+	        var suiteResults: SuiteResults = reporter.printResults(suite);
+            output.addSuite(suiteResults);
         });
 
-	    const formattedDate = new FormattedDate().date;
-	    const report = new TemplateBuilder(formattedDate, output).template;
+	    const formattedDate: FormattedDate = new FormattedDate();
+	    const report = new TemplateBuilder(formattedDate.getDate(), output.print()).getTemplate();
 
-        fs.writeFile(opts.filename, report, {encoding: 'utf8'}, (err) => {
+        fs.writeFile(opts.getFilename(), report, {encoding: 'utf8'}, (err) => {
             if(err){
-                console.error('Error writing to file:' + opts.dest + opts.filename);
+                console.error('Error writing to file:' + opts.getDest() + opts.getFilename());
                 throw err;
             }
         });
@@ -129,5 +116,3 @@ function tractorPull(opts) {
 
     return this;
 }
-
-module.exports = tractorPull;

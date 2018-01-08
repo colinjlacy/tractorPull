@@ -1,26 +1,18 @@
-class FormattedDate {
-	constructor() {
-		this._date = null;
+export class FormattedDate {
+	private date: string;
 
-		var monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+	constructor() {
+
+		var monthNames: string[] = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 
 		const uglyDate = new Date(),
-			hours = uglyDate.getHours() < 13 ? uglyDate.getHours() : uglyDate.getHours() - 12,
-			minutes = uglyDate.getMinutes() > 9 ? uglyDate.getMinutes() : "0" + uglyDate.getMinutes(),
-			am_pm = uglyDate.getHours() < 13 ? "am" : "pm";
-		const formattedDate = monthNames[uglyDate.getMonth()] + " " + uglyDate.getDate() + ", " + uglyDate.getFullYear() + " - " + hours + ":" + minutes + am_pm;
-
-		this._date = formattedDate;
+			hours: number = uglyDate.getHours() < 13 ? uglyDate.getHours() : uglyDate.getHours() - 12,
+			minutes: string | number = uglyDate.getMinutes() > 9 ? uglyDate.getMinutes() : "0" + uglyDate.getMinutes(),
+			am_pm: string = uglyDate.getHours() < 13 ? "am" : "pm";
+		this.date = monthNames[uglyDate.getMonth()] + " " + uglyDate.getDate() + ", " + uglyDate.getFullYear() + " - " + hours + ":" + minutes + am_pm;
 	}
 
-	get date() {
-		return this._date;
+	getDate() {
+		return this.date;
 	}
-
-	set date(value) {
-		this._date = value;
-	}
-
 }
-
-module.exports =  FormattedDate;

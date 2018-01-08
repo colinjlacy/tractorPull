@@ -1,4 +1,4 @@
-function setEnd() {
+export function setEnd(): string {
 	 return '</div>' +
 	'</div>' +
 	'</div>' +
@@ -7,5 +7,3 @@ function setEnd() {
 	'</body>' +
 	'</html>';
 }
-
-module.exports = setEnd;

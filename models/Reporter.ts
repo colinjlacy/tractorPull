@@ -1,71 +1,70 @@
+import * as fs from 'fs';
+import { SuiteResults } from './SuiteResults';
+import { Options } from './Options';
+import { iSpecResults } from '../interfaces/results';
+import jasmine from 'jasmine';
+import * as _ from 'lodash';
+import * as Jimp from 'jimp';
 
-var fs                      = require('fs'),
-	_                       = require('lodash'),
-	jimp                    = require('jimp');
+export class Reporter {
+	private opts: Options;
+	private suites: {[key: string]: jasmine.Suite};
+	private specs: {[key: string]: jasmine.Spec};
+	private runningSuite: jasmine.Suite;
 
-class Reporter {
-
-	constructor(opts) {
-		this._opts = opts;
-		this._suites = {};
-		this._specs = {};
-		this._runningSuite = null;
+	constructor(opts: Options) {
+		this.opts = opts;
+		this.suites = {};
+		this.specs = {};
+		this.runningSuite = null;
 	}
 
-	get runningSuite() {
-		return this._runningSuite;
+	public getRunningSuite(): jasmine.Suite {
+		return this.runningSuite;
 	}
 
-	set runningSuite(data) {
-		this._runningSuite = data;
+	public setRunningSuite(data: jasmine.Suite): void {
+		this.runningSuite = data;
 	}
 
-	get suites() {
-		return this._suites;
+	public getSuites(): {[key: string]: jasmine.Suite} {
+		return this.suites;
 	}
 
-	set suites(data) {
-		this._suites = data;
-	}
-
-	get specs() {
-		return this._specs;
-	}
-
-	set specs(data) {
-		this._specs = data;
+	public getSpecs(): {[key: string]: jasmine.Spec} {
+		return this.specs;
 	}
 
 	// returns spec clone or creates one
-	getSpecClone(spec) {
-		this._specs[spec.id] = _.extend((this.specs[spec.id] || {}), spec);
-		return this._specs[spec.id];
-	};
+	public getSpecClone(spec: jasmine.Spec): jasmine.Spec {
+		this.specs[spec.id] = _.extend((this.specs[spec.id] || {}), spec);
+		return this.specs[spec.id];
+	}
 
 
 	// returns suite clone or creates one
-	getSuiteClone(suite) {
-		this._suites[suite.id] = _.extend((this._suites[suite.id] || {}), suite);
-		return this._suites[suite.id];
+	public getSuiteClone(suite: jasmine.Suite): jasmine.Suite {
+		this.suites[suite.id] = _.extend((this.suites[suite.id] || {}), suite);
+		return this.suites[suite.id];
 	}
 
 	// write data into opts.dest as filename
-	writeScreenshot(spec, data, filename) {
+	public writeScreenshot(spec: any, data: any, filename: string): void {
 		let imageBuffer = new Buffer(data, 'base64');
-		if(spec.element) {
-			jimp.read(imageBuffer).then((image /* Jimp */ ) => {
+		if(!!spec.element) {
+			Jimp.read(imageBuffer).then((image: Jimp.Jimp) => {
 				image.crop(spec.element.left, spec.element.top, spec.element.width, spec.element.height);
-				image.write(this._opts.dest + filename);
+				image.write(this.opts.getDest() + filename);
 			});
 		} else {
-			var stream = fs.createWriteStream(this._opts.dest + filename);
+			var stream = fs.createWriteStream(this.opts.getDest() + filename);
 			stream.write(imageBuffer);
 			stream.end();
 		}
 	}
 
 	// returns duration in seconds
-	getDuration(obj) {
+	public getDuration(obj): number {
 		if (!obj._started || !obj._finished) {
 			return 0;
 		}
@@ -73,10 +72,10 @@ class Reporter {
 		return (duration < 1) ? duration : Math.round(duration);
 	}
 
-	printSpec(spec) {
-		var suiteName = spec._suite ? spec._suite.fullName : '';
+	public printSpec(spec: any): iSpecResults {
+		var suiteName: string = spec._suite ? spec._suite.fullName : '';
 		if (spec.isPrinted) {
-			return;
+			return null;
 		}
 
 		spec.isPrinted = true;
@@ -91,42 +90,34 @@ class Reporter {
 		};
 	}
 
-	printResults(suite) {
-		var output = {};
-
-		output.suiteFullName = suite.fullName;
-		output.suiteDuration = this.getDuration(suite);
-		output.specs = [];
-		output.specsPassed = 0;
-		output.specsFailed = 0;
+	public printResults(suite: any): SuiteResults {
+		var output: SuiteResults = new SuiteResults(suite.fullName, this.getDuration(suite));
 
 		_.each(suite._specs, (spec) => {
-			spec = this._specs[spec.id];
-			output.specs.push(this.printSpec(spec));
+			spec = this.specs[spec.id];
+			output.addSpec(this.printSpec(spec));
 			if (spec.status === 'failed') {
-				output.specsFailed++;
+				output.incrementSpecsFailed();
 			} else {
-				output.specsPassed++;
+				output.incrementSpecsPassed();
 			}
 		});
 
 		if (suite._suites.length > 0) {
-			output.chilSuites = [];
 			_.each(suite._suites, (childSuite) => {
-				output.chilSuites.push(this.printResults(childSuite));
+				output.addChildSuite(this.printResults(childSuite));
 			});
 		}
 
 		return output;
 	}
 
-	printReasonsForFailure(spec) {
-		if (spec.status !== 'failed') {
-			return;
-		}
+	public printReasonsForFailure(spec: any): string[] {
+		if (spec.status !== 'failed') return null;
 
-		var reasons = [];
-		_.each(spec.failedExpectations, function(exp) {
+		let reasons: string[] = [];
+
+		_.each(spec.failedExpectations, (exp: string): void => {
 			reasons.push(exp);
 		});
 
@@ -134,5 +125,3 @@ class Reporter {
 	}
 
 }
-
-module.exports = Reporter;

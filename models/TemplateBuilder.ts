@@ -1,32 +1,25 @@
-const setHead               = require('../templates/setHead.template.ts'),
-	setEnd                  = require('../templates/setEnd.template.ts'),
-	setReportContent        = require('../templates/setReportContent.template.ts');
+import { setHead } from '../templates/setHead.template';
+import { setEnd } from '../templates/setEnd.template';
+import { setReportContent } from '../templates/setReportContent.template';
+import { iTestResults } from '../interfaces/results';
 
+export class TemplateBuilder {
 
-class TemplateBuilder {
-	/**
-	 * constructor
-	 * @param formattedDate: string
-	 * @param dataObj: {suites: Suite[], specs: number, specsPassed: number, specsFailed: number, isPrinted: boolean}
-	 * @returns {string}
-	 */
-	constructor(formattedDate, dataObj) {
+	private template: string;
 
-		this._template = '';
+	public constructor(formattedDate: string, dataObj: iTestResults) {
 
-		var head = setHead(formattedDate, dataObj);
+		const head: string = setHead(formattedDate, dataObj);
 
-		var report = setReportContent(dataObj);
+		const report: string = setReportContent(dataObj);
 
-		var end = setEnd();
+		const end: string = setEnd();
 
-		this._template = head + report + end;
+		this.template = head + report + end;
 
 	}
 
-	get template() {
-		return this._template;
+	public getTemplate(): string {
+		return this.template;
 	}
 }
-
-module.exports = TemplateBuilder;
