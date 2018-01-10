@@ -1,4 +1,3 @@
-import jasmine from 'jasmine';
 import { ExtendedSpec } from '../models/ExtendedSpec';
 import { ExtendedSuite } from '../models/ExtendedSuite';
 import { SpecResults } from '../models/SpecResults';

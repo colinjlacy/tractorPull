@@ -1,5 +1,5 @@
 import { ExtendedSuite } from './ExtendedSuite';
-import jasmine from 'jasmine';
+const jasmine = require('jasmine');
 const hat = require('hat');
 
 export class ExtendedSpec {

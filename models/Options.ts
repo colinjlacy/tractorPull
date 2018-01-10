@@ -8,7 +8,7 @@ export class Options {
 	private captureOnlyFailedSpecs: boolean;
 
 	constructor(init: iOptions) {
-		this.dest                       = init.dest || './results/screenshots';
+		this.dest                       = init.dest || './results/screenshots/';
 		this.filename                   = init.filename || './results/report.html';
 		this.ignoreSkippedSpecs         = init.ignoreSkippedSpecs || false;
 		this.captureOnlyFailedSpecs     = init.captureOnlyFailedSpecs || false;

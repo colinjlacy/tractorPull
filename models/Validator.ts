@@ -2,7 +2,7 @@ import { Options } from './Options';
 import { ExtendedSuite } from './ExtendedSuite';
 import { ExtendedSpec } from './ExtendedSpec';
 import * as _ from 'lodash';
-import jasmine from 'jasmine';
+const jasmine = require('jasmine');
 
 export class Validator {
 
@@ -12,7 +12,7 @@ export class Validator {
 		this.opts = opts;
 	}
 
-	isSpecValid(spec: any) {
+	isSpecValid(spec: ExtendedSpec) {
 		// Don't screenshot skipped specs
 		var isSkipped = this.opts.isIgnoreSkippedSpecs() && spec.status === 'pending';
 		// Screenshot only for failed specs

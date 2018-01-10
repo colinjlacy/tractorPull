@@ -2,7 +2,6 @@ import { iSuiteResults } from '../interfaces/results';
 import { SpecResults } from './SpecResults';
 import { ExtendedSpec } from './ExtendedSpec';
 import { ExtendedSuite } from './ExtendedSuite';
-import jasmine from 'jasmine';
 
 export class SuiteResults implements iSuiteResults {
 	private _suiteFullName: string;

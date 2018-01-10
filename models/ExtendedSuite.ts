@@ -1,4 +1,4 @@
-import jasmine from 'jasmine';
+const jasmine = require('jasmine');
 import { ExtendedSpec } from './ExtendedSpec';
 
 export class ExtendedSuite {
@@ -24,7 +24,7 @@ export class ExtendedSuite {
 		this._description = orig.description;
 		this._env = orig.env;
 		this._id = orig.id;
-		this.parentSuite = orig.parentSuite;
+		this._parentSuite = orig.parentSuite;
 		this._queue = orig.queue
 	}
 

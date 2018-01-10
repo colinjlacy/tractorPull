@@ -2,7 +2,7 @@
   "name": "tractorPull",
   "version": "0.0.1",
   "author": "colinjlacy",
-  "main": "tractorPull.compiled.js",
+  "main": "dist/tractorPull.js",
   "description": "A Jasmine reporter specifically built for use in Protractor, based on the protractor-html-screenshot-reporter at https://github.com/jintoppy/protractor-html-screenshot-reporter, but much prettier with template logic broken out of the test result handling.",
   "dependencies": {
     "hat": "0.0.3",

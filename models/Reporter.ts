@@ -5,9 +5,9 @@ import { Options } from './Options';
 import { ExtendedSuite } from './ExtendedSuite';
 import { ExtendedSpec } from './ExtendedSpec';
 import { iSpecResults } from '../interfaces/results';
-import jasmine from 'jasmine';
 import * as _ from 'lodash';
 import * as Jimp from 'jimp';
+const jasmine = require('jasmine');
 
 export class Reporter {
 	private opts: Options;
@@ -99,7 +99,7 @@ export class Reporter {
 	public printResults(suite: ExtendedSuite): SuiteResults {
 		var output: SuiteResults = new SuiteResults(suite.fullName, this.getDuration(suite));
 
-		suite.specs.forEach((specOrig: ExtendedSpec) => {
+		suite._specs.forEach((specOrig: ExtendedSpec) => {
 			const spec: ExtendedSpec = this.specs[specOrig.id];
 			output.addSpec(this.printSpec(spec));
 			if (spec.status === 'failed') {
@@ -109,8 +109,8 @@ export class Reporter {
 			}
 		});
 
-		if (suite.suites.length > 0) {
-			suite.suites.forEach((childSuite: ExtendedSuite) => {
+		if (suite._suites.length > 0) {
+			suite._suites.forEach((childSuite: ExtendedSuite) => {
 				output.addChildSuite(this.printResults(childSuite));
 			});
 		}

@@ -10,99 +10,107 @@ import { Validator } from './models/Validator';
 import { iOptions } from './interfaces/options';
 import { browser, by, element } from 'protractor';
 import * as _ from 'lodash';
-import fs from 'fs';
-import jasmine from 'jasmine';
-import mkdirp from 'mkdirp';
+import * as fs from 'fs';
+import * as mkdirp from 'mkdirp';
+const jasmine = require('jasmine');
 
-export function tractorPull(initialOptions: iOptions): jasmine.CustomReporter  {
+export class TractorPull {
 
-	const opts: Options = new Options(initialOptions);
-	const reporter: Reporter = new Reporter(opts);
-	const validator = new Validator(opts);
+	public jasmineStarted: Function;
+	public suiteStarted: Function;
+	public suiteDone: Function;
+	public specStarted: Function;
+	public specDone: Function;
+	public jasmineDone: Function;
 
-	this.jasmineStarted = function(): void {
-        mkdirp(opts.getDest(), function(err): void {
-            var files;
+	constructor(initialOptions: iOptions) {
+		const opts: Options = new Options(initialOptions);
+		const reporter: Reporter = new Reporter(opts);
+		const validator = new Validator(opts);
 
-            if(err) {
-                throw new Error('Could not create directory ' + opts.getDest());
-            }
+		this.jasmineStarted = function(): void {
+			mkdirp(opts.getDest(), function(err): void {
+				var files;
 
-            files = fs.readdirSync(opts.getDest());
+				if(err) {
+					throw new Error('Could not create directory ' + opts.getDest());
+				}
 
-            files.forEach((file) => {
-                var filepath = opts.getDest() + file;
-                if (fs.statSync(filepath).isFile()) {
-                    fs.unlinkSync(filepath);
-                }
-            });
-        });
-    };
+				files = fs.readdirSync(opts.getDest());
 
-    this.suiteStarted = function(suiteOrig: jasmine.Suite): void {
-	    const runningSuite = reporter.getRunningSuite();
-		const suite = reporter.setSuiteClone(suiteOrig);
+				files.forEach((file) => {
+					var filepath = opts.getDest() + file;
+					if (fs.statSync(filepath).isFile()) {
+						fs.unlinkSync(filepath);
+					}
+				});
+			});
+		};
 
-		if (runningSuite) {
-	        runningSuite.suites.push();
-	        reporter.setRunningSuite(runningSuite);
-        }
+		this.suiteStarted = function(suiteOrig: jasmine.Suite): void {
+			const runningSuite = reporter.getRunningSuite();
+			const suite = reporter.setSuiteClone(suiteOrig);
 
-        reporter.setRunningSuite(suite);
-    };
+			if (runningSuite) {
+				runningSuite.suites.push();
+				reporter.setRunningSuite(runningSuite);
+			}
 
-    this.suiteDone = function(suiteOrig: jasmine.Suite): void {
-	    const suite = reporter.getSuiteClone(suiteOrig);
-	    suite.finished = Date.now();
-        reporter.setRunningSuite(suite.parent);
-    };
+			reporter.setRunningSuite(suite);
+		};
 
-    this.specStarted = function(specOrig: jasmine.Spec): void {
-		const runningSuite = reporter.getRunningSuite();
-	    const spec = reporter.setSpecClone(specOrig, runningSuite);
-	    runningSuite.specs.push(spec);
-	    reporter.setRunningSuite(runningSuite);
-    };
+		this.suiteDone = function(suiteOrig: jasmine.Suite): void {
+			const suite = reporter.getSuiteClone(suiteOrig);
+			suite.finished = Date.now();
+			reporter.setRunningSuite(suite.parent);
+		};
 
-    this.specDone = function(specOrig: jasmine.Spec): void {
-	    const spec = reporter.getSpecClone(specOrig);
-        spec.finished = Date.now();
+		this.specStarted = function(specOrig: jasmine.Spec): void {
+			const runningSuite = reporter.getRunningSuite();
+			const spec = reporter.setSpecClone(specOrig, runningSuite);
+			runningSuite.specs.push(spec);
+			reporter.setRunningSuite(runningSuite);
+		};
 
-        if (!validator.isSpecValid(spec)) {
-            spec.isPrinted = true;
-            return;
-        }
+		this.specDone = function(specOrig: jasmine.Spec): void {
+			const spec = reporter.getSpecClone(specOrig);
+			spec.finished = Date.now();
 
-        browser.takeScreenshot().then((png) => {
-            reporter.writeScreenshot(spec, png, spec.filename);
-        });
-    };
+			if (!validator.isSpecValid(spec)) {
+				spec.isPrinted = true;
+				return;
+			}
 
-    this.jasmineDone = function(): void {
-        var output: TestResults = new TestResults();
+			browser.takeScreenshot().then((png) => {
+				reporter.writeScreenshot(spec, png, spec.filename);
+			});
+		};
 
-	    const suites = reporter.getSuites();
+		this.jasmineDone = function(): void {
+			var output: TestResults = new TestResults();
 
-		(<any>Object).values(suites).forEach((suite: ExtendedSuite) => {
-	        if (!validator.hasValidSpecs(suite)) {
-		        return;
-	        }
-	        var suiteResults: SuiteResults = reporter.printResults(suite);
-            output.addSuite(suiteResults);
-        });
+			const suites = reporter.getSuites();
 
-	    const formattedDate: FormattedDate = new FormattedDate();
-	    const report = new TemplateBuilder(formattedDate.getDate(), output.print()).getTemplate();
+			(<any>Object).values(suites).forEach((suite: ExtendedSuite) => {
+				if (!validator.hasValidSpecs(suite)) {
+					return;
+				}
+				var suiteResults: SuiteResults = reporter.printResults(suite);
+				output.addSuite(suiteResults);
+			});
 
-        fs.writeFile(opts.getFilename(), report, {encoding: 'utf8'}, (err) => {
-            if(err){
-                console.error('Error writing to file:' + opts.getDest() + opts.getFilename());
-                throw err;
-            }
-        });
+			const formattedDate: FormattedDate = new FormattedDate();
+			const report = new TemplateBuilder(formattedDate.getDate(), output.print()).getTemplate();
 
-	    browser.driver.sleep(1500);
-    };
+			fs.writeFile(opts.getFilename(), report, {encoding: 'utf8'}, (err) => {
+				if(err){
+					console.error('Error writing to file:' + opts.getDest() + opts.getFilename());
+					throw err;
+				}
+			});
 
-    return this;
+			browser.driver.sleep(1500);
+		};
+
+	}
 }

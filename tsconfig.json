@@ -1,16 +1,16 @@
 {
     "compilerOptions": {
-        "module": "system",
+        "module": "commonjs",
         "moduleResolution": "Node",
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "removeComments": true,
         "preserveConstEnums": true,
-        "outFile": "index.js",
         "sourceMap": true,
         "declaration": true,
         "traceResolution": false,
-        "target": "es6"
+        "target": "es6",
+        "outDir": "dist"
     },
     "include": [
         "tractorPull.ts",
