@@ -1,13 +1,13 @@
 import { setHead } from '../templates/setHead.template';
 import { setEnd } from '../templates/setEnd.template';
 import { setReportContent } from '../templates/setReportContent.template';
-import { iTestResults } from '../interfaces/results';
+import { TestResults } from '../models/TestResults';
 
 export class TemplateBuilder {
 
 	private template: string;
 
-	public constructor(formattedDate: string, dataObj: iTestResults) {
+	public constructor(formattedDate: string, dataObj: TestResults) {
 
 		const head: string = setHead(formattedDate, dataObj);
 

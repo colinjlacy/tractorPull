@@ -1,50 +1,58 @@
-import { iTestResults } from '../interfaces/results';
+import { TestResults } from '../models/TestResults';
+import { ExtendedSuite } from '../models/ExtendedSuite';
+import { ExtendedSpec } from '../models/ExtendedSpec';
+import { SpecResults } from '../models/SpecResults';
+import { SuiteResults } from '../models/SuiteResults';
 
-export function setReportContent(data: iTestResults) {
+export function setReportContent(data: TestResults) {
 	var tpl = "";
+
 	// loop through the suites
-	for (var suite = 0; suite < data.suites.length; suite++) {
-		tpl += '<h3>' + data.suites[suite].suiteFullName + '<small> | Duration: ' + data.suites[suite].suiteDuration + ' seconds</small></h3>' +
+	data.getSuites().forEach((suite: SuiteResults, suiteInd: number) => {
+		tpl += '<h3>' + suite.getSuiteFullName() + '<small> | Duration: ' + suite.getSuiteDuration() + ' seconds</small></h3>' +
 			'<div class="panel-group" id="accordion" role="tablist" aria-multiselectable="true">';
+
 		// loop through the specs
-		for (var spec = 0; spec < data.suites[suite].specs.length; spec++) {
+		suite.getSpecs().forEach((spec: SpecResults, specInd: number) => {
 			// sets the background for the panels
-			var bg = data.suites[suite].specs[spec].status === "passed" ? "success" : "danger";
+			var bg = spec.getStatus() === "passed" ? "success" : "danger";
 			// continues building out the template
 			tpl += '<div class="panel panel-' + bg + '">' +
-				'<div class="panel-heading" role="tab" id="heading' + suite + "--" +spec + '">' +
+				'<div class="panel-heading" role="tab" id="heading' + suiteInd + "--" + specInd + '">' +
 				'<h4 class="panel-title">' +
-				'<a data-toggle="collapse" data.suites-parent="#accordion" href="#collapse' + suite + "--" +spec + '" aria-expanded="true" aria-controls="collapseOne">' +
-				data.suites[suite].specs[spec].shortname +
+				'<a data-toggle="collapse" data.suites-parent="#accordion" href="#collapse' + suiteInd + "--" + specInd + '" aria-expanded="true" aria-controls="collapseOne">' +
+				spec.getShortname() +
 				'</a>' +
 				'</h4>' +
 				'</div>' +
-				'<div id="collapse' + suite + "--" +spec + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">' +
+				'<div id="collapse' + suiteInd + "--" + specInd + '" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingOne">' +
 				'<div class="panel-body">';
+
 			// pass a simple message if it passed
-			if (data.suites[suite].specs[spec].status === 'passed') {
-				tpl += '<p><strong>Duration: </strong>' + data.suites[suite].specs[spec].duration + ' seconds, <a href="' + data.suites[suite].specs[spec].link + '"><span class="fa fa-picture-o"></span> View Screenshot</a></p>';
-			} else if(data.suites[suite].specs[spec].failure) { // pass a list of reasons for failures if it fails
-				tpl += '<p><strong>Duration: </strong>' + data.suites[suite].specs[spec].duration + ' seconds</p>';
-				for (var fail = 0; fail < data.suites[suite].specs[spec].failure.length; fail++) {
-					tpl += '<p><strong>Message: </strong>' + data.suites[suite].specs[spec].failure[fail].message + '</p>' +
+			if (spec.getStatus() === 'passed') {
+				tpl += '<p><strong>Duration: </strong>' + spec.getDuration() + ' seconds, <a href="' + spec.getLink() + '"><span class="fa fa-picture-o"></span> View Screenshot</a></p>';
+			} else if(spec.getFailure()) { // pass a list of reasons for failures if it fails
+				tpl += '<p><strong>Duration: </strong>' + spec.getDuration() + ' seconds</p>';
+
+				spec.getFailure().forEach((failure: {message: string, stack: any}) => {
+					tpl += '<p><strong>Message: </strong>' + failure.message + '</p>' +
 						'<p><strong>Stack Trace:</strong></p>' +
-						'<p><small>' + data.suites[suite].specs[spec].failure[fail].stack + '</small></p>';
-				}
-				tpl += '<a href="' + data.suites[suite].specs[spec].link + '"><span class="fa fa-picture-o"></span> View Screenshot</a>' +
+						'<p><small>' + failure.stack + '</small></p>';
+				});
+
+				tpl += '<a href="' + spec.getLink() + '"><span class="fa fa-picture-o"></span> View Screenshot</a>' +
 					'</p>';
 			}
-
 
 			tpl += '</div>' +
 				'</div>' +
 				'</div>'
-		}
+		});
 
 		tpl += '</div>' +
 			'<hr/>';
 
-	}
+	});
 
 	return tpl;
 }

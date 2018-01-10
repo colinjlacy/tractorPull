@@ -1,64 +1,63 @@
-import { iSuiteResults } from '../interfaces/results';
 import { SpecResults } from './SpecResults';
 import { ExtendedSpec } from './ExtendedSpec';
 import { ExtendedSuite } from './ExtendedSuite';
 
-export class SuiteResults implements iSuiteResults {
-	private _suiteFullName: string;
-	private _suiteDuration: number;
-	private _childSuites: ExtendedSuite[];
-	private _specs: SpecResults[];
-	private _specsPassed: number;
-	private _specsFailed: number;
+export class SuiteResults {
+	private suiteFullName: string;
+	private suiteDuration: number;
+	private childSuites: ExtendedSuite[];
+	private specs: SpecResults[];
+	private specsPassed: number;
+	private specsFailed: number;
 
 
 	public constructor(suiteFullName:string, suiteDuration:number) {
-		this._suiteFullName = suiteFullName;
-		this._suiteDuration = suiteDuration;
-		this._specs = [];
-		this._childSuites = [];
-		this._specsPassed = 0;
-		this._specsFailed = 0;
+		this.suiteFullName = suiteFullName;
+		this.suiteDuration = suiteDuration;
+		this.specs = [];
+		this.childSuites = [];
+		this.specsPassed = 0;
+		this.specsFailed = 0;
 	}
 
-	public get suiteFullName():string {
-		return this._suiteFullName;
+	public getSuiteFullName():string {
+		return this.suiteFullName;
 	}
 
-	public get suiteDuration():number {
-		return this._suiteDuration;
+	public getSuiteDuration():number {
+		return this.suiteDuration;
 	}
 
-	public get childSuites():ExtendedSuite[] {
-		return this._childSuites;
+	public getChildSuites():ExtendedSuite[] {
+		return this.childSuites;
 	}
 
-	public get specs():SpecResults[] {
-		return this._specs;
+	public getSpecs():SpecResults[] {
+		return this.specs;
 	}
 
-	public get specsPassed():number {
-		return this._specsPassed;
+	public getSpecsPassed():number {
+		return this.specsPassed;
 	}
 
-	public get specsFailed():number {
-		return this._specsFailed;
+	public getSpecsFailed():number {
+		return this.specsFailed;
 	}
 
 	public addSpec(spec: SpecResults): void {
-		this._specs.push(spec);
+		this.specs.push(spec);
 	}
 
 	public addChildSuite(suite: any): void {
-		this._childSuites.push(suite);
+		this.childSuites.push(suite);
 	}
 
 	public incrementSpecsPassed(): void {
-		this._specsPassed++;
+		this.specsPassed++;
 	}
 
 	public incrementSpecsFailed(): void {
-		this._specsFailed++;
+		this.specsFailed++;
 	}
 
 	public printResults(): SuiteResults {

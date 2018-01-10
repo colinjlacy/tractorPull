@@ -1,6 +1,6 @@
-import { iTestResults } from '../interfaces/results';
+import { TestResults } from '../models/TestResults';
 
-export function setHead(date: string, dataObj: iTestResults) {
+export function setHead(date: string, dataObj: TestResults) {
 	return '<!DOCTYPE html>' +
 		'<head>' +
 		'<title>' + date + '</title>' +
@@ -14,17 +14,17 @@ export function setHead(date: string, dataObj: iTestResults) {
 		'<div class="col-sm-12">' +
 		'<h1>Report: ' + date + '</h1>' +
 		'<hr/>' +
-		'<h2>Test Suites Run: ' + dataObj.suites.length + '</h2>' +
+		'<h2>Test Suites Run: ' + dataObj.getSuites().length + '</h2>' +
 		'<hr/>' +
 		'<div class="row">' +
 		'<div class="col-sm-4">' +
-		'<h3 class="text-muted"><span class="fa fa-exclamation-circle"></span> Total Specs Run: ' + dataObj.specs + '</h3>' +
+		'<h3 class="text-muted"><span class="fa fa-exclamation-circle"></span> Total Specs Run: ' + dataObj.getSpecs() + '</h3>' +
 		'</div>' +
 		'<div class="col-sm-4">' +
-		'<h3 class="text-muted"><span class="fa fa-check-circle text-success"></span> Specs Passed: ' + dataObj.specsPassed + '</h3>' +
+		'<h3 class="text-muted"><span class="fa fa-check-circle text-success"></span> Specs Passed: ' + dataObj.getSpecsPassed() + '</h3>' +
 		'</div>' +
 		'<div class="col-sm-4">' +
-		'<h3 class="text-muted"><span class="fa fa-times-circle text-danger"></span> Specs Failed: ' + dataObj.specsFailed + '</h3>' +
+		'<h3 class="text-muted"><span class="fa fa-times-circle text-danger"></span> Specs Failed: ' + dataObj.getSpecsFailed() + '</h3>' +
 		'</div>' +
 		'</div>' +
 		'<hr/>';

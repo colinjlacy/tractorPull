@@ -5,6 +5,7 @@ import { SuiteResults } from './models/SuiteResults';
 import { FormattedDate } from './models/FormattedDate';
 import { TemplateBuilder } from './models/TemplateBuilder';
 import { ExtendedSuite } from './models/ExtendedSuite';
+import { ExtendedSpec } from './models/ExtendedSpec';
 import { Options } from './models/Options';
 import { Validator } from './models/Validator';
 import { iOptions } from './interfaces/options';
@@ -48,11 +49,10 @@ export class TractorPull {
 		};
 
 		this.suiteStarted = function(suiteOrig: jasmine.Suite): void {
-			const runningSuite = reporter.getRunningSuite();
-			const suite = reporter.setSuiteClone(suiteOrig);
+			const runningSuite: ExtendedSuite = reporter.getRunningSuite();
+			const suite: ExtendedSuite = reporter.setSuiteClone(suiteOrig);
 
 			if (runningSuite) {
-				runningSuite.suites.push();
 				reporter.setRunningSuite(runningSuite);
 			}
 
@@ -61,23 +61,23 @@ export class TractorPull {
 
 		this.suiteDone = function(suiteOrig: jasmine.Suite): void {
 			const suite = reporter.getSuiteClone(suiteOrig);
-			suite.finished = Date.now();
-			reporter.setRunningSuite(suite.parent);
+			suite.setFinished(Date.now());
+			reporter.setRunningSuite(suite.getParent());
 		};
 
 		this.specStarted = function(specOrig: jasmine.Spec): void {
 			const runningSuite = reporter.getRunningSuite();
 			const spec = reporter.setSpecClone(specOrig, runningSuite);
-			runningSuite.specs.push(spec);
+			runningSuite.setSpecs([...runningSuite.getSpecs(), spec]);
 			reporter.setRunningSuite(runningSuite);
 		};
 
 		this.specDone = function(specOrig: jasmine.Spec): void {
-			const spec = reporter.getSpecClone(specOrig);
+			const spec: any = reporter.getSpecClone(specOrig);
 			spec.finished = Date.now();
 
 			if (!validator.isSpecValid(spec)) {
-				spec.isPrinted = true;
+				spec.printed = true;
 				return;
 			}
 
@@ -91,10 +91,12 @@ export class TractorPull {
 
 			const suites = reporter.getSuites();
 
+
 			(<any>Object).values(suites).forEach((suite: ExtendedSuite) => {
 				if (!validator.hasValidSpecs(suite)) {
 					return;
 				}
+				console.log(suite);
 				var suiteResults: SuiteResults = reporter.printResults(suite);
 				output.addSuite(suiteResults);
 			});

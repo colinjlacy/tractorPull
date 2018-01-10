@@ -3,122 +3,122 @@ const jasmine = require('jasmine');
 const hat = require('hat');
 
 export class ExtendedSpec {
-	private _started: number;
-	private _finished: number;
-	private _filename: string;
-	private _element: {top: number; left: number; width: number; height: number};
-	private _description: string;
-	private _env: jasmine.Env;
-	private _id: number;
-	private _results_: jasmine.NestedResults;
-	private _suite: ExtendedSuite;
-	private _isPrinted: boolean;
-	private _status: string;
-	private _failedExpectations: {message: string, stack: any}[];
+	private started: number;
+	private finished: number;
+	private filename: string;
+	private element: {top: number; left: number; width: number; height: number};
+	private description: string;
+	private env: jasmine.Env;
+	private id: number;
+	private results: jasmine.NestedResults;
+	private suite: ExtendedSuite;
+	private printed: boolean;
+	private status: string;
+	private failedExpectations: {message: string, stack: any}[];
 
 	constructor(spec: jasmine.Spec, suite: ExtendedSuite) {
-		this._started = Date.now();
-		this._filename = hat() + '.png';
-		this._description = spec.description;
-		this._env = spec.env;
-		this._id = spec.id;
-		this._suite = suite;
+		this.started = Date.now();
+		this.filename = hat() + '.png';
+		this.description = spec.description;
+		this.env = spec.env;
+		this.id = spec.id;
+		this.suite = suite;
+		this.printed = false;
 	}
 
-
-	public get status():string {
-		return this._status;
+	public getStatus():string {
+		return this.status;
 	}
 
-	public set status(value:string) {
-		this._status = value;
+	public setStatus(value:string) {
+		this.status = value;
 	}
 
-	public get failedExpectations():{message: string, stack: any}[] {
-		return this._failedExpectations;
+	public getFailedExpectations():{message: string, stack: any}[] {
+		return this.failedExpectations;
 	}
 
-	public set failedExpectations(value:{message: string, stack: any}[]) {
-		this._failedExpectations = value;
+	public setFailedExpectations(value:{message: string, stack: any}[]) {
+		this.failedExpectations = value;
 	}
 
-	public get isPrinted():boolean {
-		return this._isPrinted;
+	public isPrinted():boolean {
+		return this.printed;
 	}
 
-	public set isPrinted(value:boolean) {
-		this._isPrinted = value;
+	public setPrinted(value:boolean) {
+		this.printed = value;
 	}
 
-	public get started():number {
-		return this._started;
+	public getStarted():number {
+		return this.started;
 	}
 
-	public set started(value:number) {
-		this._started = value;
+	public setStarted(value:number) {
+		this.started = value;
 	}
 
-	public get finished():number {
-		return this._finished;
+	public getFinished():number {
+		return this.finished;
 	}
 
-	public set finished(value:number) {
-		this._finished = value;
+	public setFinished(value:number) {
+		this.finished = value;
 	}
 
-	public get filename():string {
-		return this._filename;
+	public getFilename():string {
+		return this.filename;
 	}
 
-	public set filename(value:string) {
-		this._filename = value;
+	public setFilename(value:string) {
+		this.filename = value;
 	}
 
-	public get element():{top: number, left: number, width: number, height: number} {
-		return this._element;
+	public getElement():{top: number, left: number, width: number, height: number} {
+		return this.element;
 	}
 
-	public set element(value:{top: number, left: number, width: number, height: number}) {
-		this._element = value;
+	public setElement(value:{top: number, left: number, width: number, height: number}) {
+		this.element = value;
 	}
 
-	public get description():string {
-		return this._description;
+	public getDescription():string {
+		return this.description;
 	}
 
-	public set description(value:string) {
-		this._description = value;
+	public setDescription(value:string) {
+		this.description = value;
 	}
 
-	public get env():jasmine.Env {
-		return this._env;
+	public getEnv():jasmine.Env {
+		return this.env;
 	}
 
-	public set env(value:jasmine.Env) {
-		this._env = value;
+	public setEnv(value:jasmine.Env) {
+		this.env = value;
 	}
 
-	public get id():number {
-		return this._id;
+	public getId():number {
+		return this.id;
 	}
 
-	public set id(value:number) {
-		this._id = value;
+	public setId(value:number) {
+		this.id = value;
 	}
 
-	public get results_():jasmine.NestedResults {
-		return this._results_;
+	public getResults():jasmine.NestedResults {
+		return this.results;
 	}
 
-	public set results_(value:jasmine.NestedResults) {
-		this._results_ = value;
+	public setResults(value:jasmine.NestedResults) {
+		this.results = value;
 	}
 
-	public get suite():ExtendedSuite {
-		return this._suite;
+	public getSuite():ExtendedSuite {
+		return this.suite;
 	}
 
-	public set suite(value:ExtendedSuite) {
-		this._suite = value;
+	public setSuite(value:ExtendedSuite) {
+		this.suite = value;
 	}
 }

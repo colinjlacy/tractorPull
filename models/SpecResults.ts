@@ -1,47 +1,46 @@
-import { iSpecResults } from '../interfaces/results';
 
-export class SpecResults implements iSpecResults {
-	private _status: string;
-	private _link: string;
-	private _fullname: string;
-	private _shortname: string;
-	private _duration: number;
-	private _failure: {message: string, stack: any}[];
+export class SpecResults {
+	private status: string;
+	private link: string;
+	private fullname: string;
+	private shortname: string;
+	private duration: number;
+	private failure: {message: string, stack: any}[];
 
 	constructor(spec: any, duration: number, reasonsForFailure: {message: string, stack: any}[]) {
-		this._status = spec._status;
-		this._link = "./screenshots/" + spec.filename;
-		this._fullname = spec._fullname;
-		this._shortname = spec.fullName.replace(spec._suite.fullName, '').trim();
-		this._duration = duration;
-		this._failure = reasonsForFailure;
+		this.status = spec.status;
+		this.link = "./screenshots/" + spec.filename;
+		this.fullname = spec.fullName;
+		this.shortname = spec.fullName.replace(spec.suite.getFullName(), '').trim();
+		this.duration = duration;
+		this.failure = reasonsForFailure;
 	}
 
-	public get status():string {
-		return this._status;
+	public getStatus():string {
+		return this.status;
 	}
 
-	public get link():string {
-		return this._link;
+	public getLink():string {
+		return this.link;
 	}
 
-	public get fullname():string {
-		return this._fullname;
+	public getFullname():string {
+		return this.fullname;
 	}
 
-	public get shortname():string {
-		return this._shortname;
+	public getShortname():string {
+		return this.shortname;
 	}
 
-	public get duration():number {
-		return this._duration;
+	public getDuration():number {
+		return this.duration;
 	}
 
-	public get failure():{message: string, stack: any}[] {
-		return this._failure;
+	public getFailure():{message: string, stack: any}[] {
+		return this.failure;
 	}
 
-	public set failure(value:{message: string, stack: any}[]) {
-		this._failure = value;
+	public setFailure(value:{message: string, stack: any}[]) {
+		this.failure = value;
 	}
 }

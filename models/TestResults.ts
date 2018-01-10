@@ -1,40 +1,39 @@
-import { iTestResults } from '../interfaces/results';
 import { SuiteResults } from './SuiteResults';
 
-export class TestResults implements iTestResults {
-	private _suites: SuiteResults[];
-	private _specs: number;
-	private _specsPassed: number;
-	private _specsFailed: number;
+export class TestResults {
+	private suites: SuiteResults[];
+	private specs: number;
+	private specsPassed: number;
+	private specsFailed: number;
 
 	public constructor() {
-		this._suites = [];
-		this._specs = 0;
-		this._specsPassed = 0;
-		this._specsFailed = 0;
+		this.suites = [];
+		this.specs = 0;
+		this.specsPassed = 0;
+		this.specsFailed = 0;
 	}
 
-	public get suites():SuiteResults[] {
-		return this._suites;
+	public getSuites():SuiteResults[] {
+		return this.suites;
 	}
 
-	public get specs():number {
-		return this._specs;
+	public getSpecs():number {
+		return this.specs;
 	}
 
-	public get specsPassed():number {
-		return this._specsPassed;
+	public getSpecsPassed():number {
+		return this.specsPassed;
 	}
 
-	public get specsFailed():number {
-		return this._specsFailed;
+	public getSpecsFailed():number {
+		return this.specsFailed;
 	}
 
 	public addSuite(suite: SuiteResults): void {
-		this._suites.push(suite);
-		this._specs += suite.specs.length;
-		this._specsPassed += suite.specsPassed;
-		this._specsFailed += suite.specsFailed;
+		this.suites.push(suite);
+		this.specs += suite.getSpecs().length;
+		this.specsPassed += suite.getSpecsPassed();
+		this.specsFailed += suite.getSpecsFailed();
 	}
 
 	public print(): TestResults {

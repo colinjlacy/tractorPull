@@ -12,7 +12,7 @@ export class Validator {
 		this.opts = opts;
 	}
 
-	isSpecValid(spec: ExtendedSpec) {
+	isSpecValid(spec: any) {
 		// Don't screenshot skipped specs
 		var isSkipped = this.opts.isIgnoreSkippedSpecs() && spec.status === 'pending';
 		// Screenshot only for failed specs
@@ -21,7 +21,7 @@ export class Validator {
 		return !isSkipped && !isIgnored;
 	}
 
-	hasValidSpecs(suite: ExtendedSuite): boolean {
+	hasValidSpecs(suite: any): boolean {
 		let validSuites: boolean = false;
 		let validSpecs: boolean = false;
 

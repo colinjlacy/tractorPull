@@ -63,11 +63,12 @@ export class Reporter {
 	}
 
 	// write data into opts.dest as filename
-	public writeScreenshot(spec: ExtendedSpec, data: any, filename: string): void {
+	public writeScreenshot(spec: any, data: any, filename: string): void {
 		let imageBuffer = new Buffer(data, 'base64');
-		if(!!spec.element) {
+		if(!!spec.getElement) {
 			Jimp.read(imageBuffer).then((image: Jimp.Jimp) => {
-				image.crop(spec.element.left, spec.element.top, spec.element.width, spec.element.height);
+				const element = spec.element;
+				image.crop(element.left, element.top, element.width, element.height);
 				image.write(this.opts.getDest() + filename);
 			});
 		} else {
@@ -78,29 +79,33 @@ export class Reporter {
 	}
 
 	// returns duration in seconds
-	public getDuration(obj: ExtendedSpec | ExtendedSuite): number {
-		if (!obj.started || !obj.finished) {
+	public getDuration(obj: any): number {
+		const started = obj.started;
+		const finished = obj.finished;
+		if (!started || !finished) {
 			return 0;
 		}
-		var duration = (obj.finished - obj.started) / 1000;
+		var duration = (finished - started) / 1000;
 		return (duration < 1) ? duration : Math.round(duration);
 	}
 
-	public printSpec(spec: ExtendedSpec): SpecResults {
-		if (spec.isPrinted) {
+	public printSpec(spec: any): SpecResults {
+		if (spec.printed) {
 			return null;
 		}
 
-		spec.isPrinted = true;
+		spec.printed = true;
 
 		return new SpecResults(spec, this.getDuration(spec), this.printReasonsForFailure(spec));
 	}
 
-	public printResults(suite: ExtendedSuite): SuiteResults {
+	public printResults(suite: any): SuiteResults {
 		var output: SuiteResults = new SuiteResults(suite.fullName, this.getDuration(suite));
 
-		suite._specs.forEach((specOrig: ExtendedSpec) => {
-			const spec: ExtendedSpec = this.specs[specOrig.id];
+		const specs = suite.specs;
+
+		specs.forEach((specOrig: any) => {
+			const spec: any = this.specs[specOrig.id];
 			output.addSpec(this.printSpec(spec));
 			if (spec.status === 'failed') {
 				output.incrementSpecsFailed();
@@ -109,8 +114,8 @@ export class Reporter {
 			}
 		});
 
-		if (suite._suites.length > 0) {
-			suite._suites.forEach((childSuite: ExtendedSuite) => {
+		if (suite.suites.length > 0) {
+			suite.suites.forEach((childSuite: ExtendedSuite) => {
 				output.addChildSuite(this.printResults(childSuite));
 			});
 		}
@@ -118,7 +123,7 @@ export class Reporter {
 		return output;
 	}
 
-	public printReasonsForFailure(spec: ExtendedSpec): {message: string, stack: any}[] {
+	public printReasonsForFailure(spec: any): {message: string, stack: any}[] {
 		if (spec.status !== 'failed') return null;
 
 		let reasons: {message: string, stack: any}[] = [];
