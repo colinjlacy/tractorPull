@@ -1,11 +1,14 @@
 import { iSuiteResults } from '../interfaces/results';
+import { SpecResults } from './SpecResults';
+import { ExtendedSpec } from './ExtendedSpec';
+import { ExtendedSuite } from './ExtendedSuite';
 import jasmine from 'jasmine';
 
 export class SuiteResults implements iSuiteResults {
 	private _suiteFullName: string;
 	private _suiteDuration: number;
-	private _childSuites: jasmine.Suite[];
-	private _specs: jasmine.Spec[];
+	private _childSuites: ExtendedSuite[];
+	private _specs: SpecResults[];
 	private _specsPassed: number;
 	private _specsFailed: number;
 
@@ -27,11 +30,11 @@ export class SuiteResults implements iSuiteResults {
 		return this._suiteDuration;
 	}
 
-	public get childSuites():jasmine.Suite[] {
+	public get childSuites():ExtendedSuite[] {
 		return this._childSuites;
 	}
 
-	public get specs():jasmine.Spec[] {
+	public get specs():SpecResults[] {
 		return this._specs;
 	}
 
@@ -43,7 +46,7 @@ export class SuiteResults implements iSuiteResults {
 		return this._specsFailed;
 	}
 
-	public addSpec(spec: any): void {
+	public addSpec(spec: SpecResults): void {
 		this._specs.push(spec);
 	}
 

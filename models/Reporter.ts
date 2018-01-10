@@ -1,6 +1,9 @@
 import * as fs from 'fs';
 import { SuiteResults } from './SuiteResults';
+import { SpecResults } from './SpecResults';
 import { Options } from './Options';
+import { ExtendedSuite } from './ExtendedSuite';
+import { ExtendedSpec } from './ExtendedSpec';
 import { iSpecResults } from '../interfaces/results';
 import jasmine from 'jasmine';
 import * as _ from 'lodash';
@@ -8,9 +11,9 @@ import * as Jimp from 'jimp';
 
 export class Reporter {
 	private opts: Options;
-	private suites: {[key: string]: jasmine.Suite};
-	private specs: {[key: string]: jasmine.Spec};
-	private runningSuite: jasmine.Suite;
+	private suites: {[key: string]: ExtendedSuite}; // values will only ever be the extended suite object
+	private specs: {[key: string]: ExtendedSpec};
+	private runningSuite: ExtendedSuite; // will actually hold the extended suite object
 
 	constructor(opts: Options) {
 		this.opts = opts;
@@ -19,37 +22,48 @@ export class Reporter {
 		this.runningSuite = null;
 	}
 
-	public getRunningSuite(): jasmine.Suite {
+	public getRunningSuite(): ExtendedSuite {
 		return this.runningSuite;
 	}
 
-	public setRunningSuite(data: jasmine.Suite): void {
+	public setRunningSuite(data: ExtendedSuite): void {
 		this.runningSuite = data;
 	}
 
-	public getSuites(): {[key: string]: jasmine.Suite} {
+	public getSuites(): {[key: string]: ExtendedSuite} {
 		return this.suites;
 	}
 
-	public getSpecs(): {[key: string]: jasmine.Spec} {
+	public getSpecs(): {[key: string]: ExtendedSpec} {
 		return this.specs;
 	}
 
-	// returns spec clone or creates one
-	public getSpecClone(spec: jasmine.Spec): jasmine.Spec {
-		this.specs[spec.id] = _.extend((this.specs[spec.id] || {}), spec);
+	// creates spec clone
+	public setSpecClone(spec: jasmine.Spec, suite: ExtendedSuite): ExtendedSpec {
+		this.specs[spec.id] = new ExtendedSpec(spec, suite);
 		return this.specs[spec.id];
 	}
 
+	// returns spec clone
+	public getSpecClone(spec: jasmine.Spec): ExtendedSpec {
+		this.specs[spec.id] = Object.assign({}, this.specs[spec.id], spec);
+		return this.specs[spec.id];
+	}
 
-	// returns suite clone or creates one
-	public getSuiteClone(suite: jasmine.Suite): jasmine.Suite {
-		this.suites[suite.id] = _.extend((this.suites[suite.id] || {}), suite);
+	// creates suite clone
+	public setSuiteClone(suite: jasmine.Suite): ExtendedSuite {
+		this.suites[suite.id] = new ExtendedSuite(suite);
+		return this.suites[suite.id];
+	}
+
+	// returns suite clone
+	public getSuiteClone(suite: jasmine.Suite): ExtendedSuite {
+		this.suites[suite.id] = Object.assign({}, this.suites[suite.id], suite);
 		return this.suites[suite.id];
 	}
 
 	// write data into opts.dest as filename
-	public writeScreenshot(spec: any, data: any, filename: string): void {
+	public writeScreenshot(spec: ExtendedSpec, data: any, filename: string): void {
 		let imageBuffer = new Buffer(data, 'base64');
 		if(!!spec.element) {
 			Jimp.read(imageBuffer).then((image: Jimp.Jimp) => {
@@ -64,37 +78,29 @@ export class Reporter {
 	}
 
 	// returns duration in seconds
-	public getDuration(obj): number {
-		if (!obj._started || !obj._finished) {
+	public getDuration(obj: ExtendedSpec | ExtendedSuite): number {
+		if (!obj.started || !obj.finished) {
 			return 0;
 		}
-		var duration = (obj._finished - obj._started) / 1000;
+		var duration = (obj.finished - obj.started) / 1000;
 		return (duration < 1) ? duration : Math.round(duration);
 	}
 
-	public printSpec(spec: any): iSpecResults {
-		var suiteName: string = spec._suite ? spec._suite.fullName : '';
+	public printSpec(spec: ExtendedSpec): SpecResults {
 		if (spec.isPrinted) {
 			return null;
 		}
 
 		spec.isPrinted = true;
 
-		return {
-			status: spec.status,
-			link: "./screenshots/" + spec.filename,
-			fullname: spec.fullname,
-			shortname: spec.fullName.replace(suiteName, '').trim(),
-			duration: this.getDuration(spec),
-			failure: this.printReasonsForFailure(spec)
-		};
+		return new SpecResults(spec, this.getDuration(spec), this.printReasonsForFailure(spec));
 	}
 
-	public printResults(suite: any): SuiteResults {
+	public printResults(suite: ExtendedSuite): SuiteResults {
 		var output: SuiteResults = new SuiteResults(suite.fullName, this.getDuration(suite));
 
-		_.each(suite._specs, (spec) => {
-			spec = this.specs[spec.id];
+		suite.specs.forEach((specOrig: ExtendedSpec) => {
+			const spec: ExtendedSpec = this.specs[specOrig.id];
 			output.addSpec(this.printSpec(spec));
 			if (spec.status === 'failed') {
 				output.incrementSpecsFailed();
@@ -103,8 +109,8 @@ export class Reporter {
 			}
 		});
 
-		if (suite._suites.length > 0) {
-			_.each(suite._suites, (childSuite) => {
+		if (suite.suites.length > 0) {
+			suite.suites.forEach((childSuite: ExtendedSuite) => {
 				output.addChildSuite(this.printResults(childSuite));
 			});
 		}
@@ -112,12 +118,12 @@ export class Reporter {
 		return output;
 	}
 
-	public printReasonsForFailure(spec: any): string[] {
+	public printReasonsForFailure(spec: ExtendedSpec): {message: string, stack: any}[] {
 		if (spec.status !== 'failed') return null;
 
-		let reasons: string[] = [];
+		let reasons: {message: string, stack: any}[] = [];
 
-		_.each(spec.failedExpectations, (exp: string): void => {
+		spec.failedExpectations.forEach((exp: {message: string, stack: any}): void => {
 			reasons.push(exp);
 		});
 

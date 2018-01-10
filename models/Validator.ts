@@ -1,4 +1,6 @@
 import { Options } from './Options';
+import { ExtendedSuite } from './ExtendedSuite';
+import { ExtendedSpec } from './ExtendedSpec';
 import * as _ from 'lodash';
 import jasmine from 'jasmine';
 
@@ -19,16 +21,16 @@ export class Validator {
 		return !isSkipped && !isIgnored;
 	}
 
-	hasValidSpecs(suite): boolean {
+	hasValidSpecs(suite: ExtendedSuite): boolean {
 		let validSuites: boolean = false;
 		let validSpecs: boolean = false;
 
-		if (suite._suites.length) {
-			validSuites = suite._suites.some((s: jasmine.Suite): boolean => this.hasValidSpecs(s));
+		if (suite.suites.length) {
+			validSuites = suite.suites.some((s: ExtendedSuite): boolean => this.hasValidSpecs(s));
 		}
 
-		if (suite._specs.length) {
-			validSpecs = suite._specs.some((s: jasmine.Spec): boolean => this.isSpecValid(s));
+		if (suite.specs.length) {
+			validSpecs = suite.specs.some((s: ExtendedSpec): boolean => this.isSpecValid(s));
 		}
 
 		return !!validSuites || !!validSpecs;

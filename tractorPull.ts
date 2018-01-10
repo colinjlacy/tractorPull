@@ -4,6 +4,7 @@ import { TestResults } from './models/TestResults';
 import { SuiteResults } from './models/SuiteResults';
 import { FormattedDate } from './models/FormattedDate';
 import { TemplateBuilder } from './models/TemplateBuilder';
+import { ExtendedSuite } from './models/ExtendedSuite';
 import { Options } from './models/Options';
 import { Validator } from './models/Validator';
 import { iOptions } from './interfaces/options';
@@ -12,7 +13,6 @@ import * as _ from 'lodash';
 import fs from 'fs';
 import jasmine from 'jasmine';
 import mkdirp from 'mkdirp';
-const hat = require('hat');
 
 export function tractorPull(initialOptions: iOptions): jasmine.CustomReporter  {
 
@@ -39,49 +39,39 @@ export function tractorPull(initialOptions: iOptions): jasmine.CustomReporter  {
         });
     };
 
-    this.suiteStarted = function(suite): void {
-	    suite = reporter.getSuiteClone(suite);
-	    suite.suites = [];
-        suite.specs = [];
-        suite._started = Date.now();
-        suite._parent = reporter.getRunningSuite();
-        suite.isPrinted = false;
+    this.suiteStarted = function(suiteOrig: jasmine.Suite): void {
+	    const runningSuite = reporter.getRunningSuite();
+		const suite = reporter.setSuiteClone(suiteOrig);
 
-	    let runningSuite = reporter.getRunningSuite();
-
-	    if (runningSuite) {
-	        runningSuite.suites().push(suite);
+		if (runningSuite) {
+	        runningSuite.suites.push();
 	        reporter.setRunningSuite(runningSuite);
         }
 
-        reporter.setRunningSuite(runningSuite);
+        reporter.setRunningSuite(suite);
     };
 
-    this.suiteDone = function(suite): void {
-	    suite = reporter.getSuiteClone(suite);
-	    suite._finished = Date.now();
-        reporter.setRunningSuite(suite._parent);
+    this.suiteDone = function(suiteOrig: jasmine.Suite): void {
+	    const suite = reporter.getSuiteClone(suiteOrig);
+	    suite.finished = Date.now();
+        reporter.setRunningSuite(suite.parent);
     };
 
-    this.specStarted = function(spec): void {
-	    spec = reporter.getSpecClone(spec);
-        spec._started = Date.now();
-        spec._suite = reporter.getRunningSuite();
-	    const runningSuite = reporter.getRunningSuite();
-	    runningSuite.specs().push(spec);
+    this.specStarted = function(specOrig: jasmine.Spec): void {
+		const runningSuite = reporter.getRunningSuite();
+	    const spec = reporter.setSpecClone(specOrig, runningSuite);
+	    runningSuite.specs.push(spec);
 	    reporter.setRunningSuite(runningSuite);
     };
 
-    this.specDone = function(spec): void {
-	    spec = reporter.getSpecClone(spec);
-        spec._finished = Date.now();
+    this.specDone = function(specOrig: jasmine.Spec): void {
+	    const spec = reporter.getSpecClone(specOrig);
+        spec.finished = Date.now();
 
         if (!validator.isSpecValid(spec)) {
             spec.isPrinted = true;
             return;
         }
-
-        spec.filename = hat() + '.png';
 
         browser.takeScreenshot().then((png) => {
             reporter.writeScreenshot(spec, png, spec.filename);
@@ -93,7 +83,7 @@ export function tractorPull(initialOptions: iOptions): jasmine.CustomReporter  {
 
 	    const suites = reporter.getSuites();
 
-		(<any>Object).values(suites).forEach((suite: jasmine.Suite) => {
+		(<any>Object).values(suites).forEach((suite: ExtendedSuite) => {
 	        if (!validator.hasValidSpecs(suite)) {
 		        return;
 	        }

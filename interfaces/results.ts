@@ -1,4 +1,7 @@
 import jasmine from 'jasmine';
+import { ExtendedSpec } from '../models/ExtendedSpec';
+import { ExtendedSuite } from '../models/ExtendedSuite';
+import { SpecResults } from '../models/SpecResults';
 
 export interface iResults {
 	specsPassed: number;
@@ -8,8 +11,8 @@ export interface iResults {
 export interface iSuiteResults extends iResults {
 	suiteFullName: string;
 	suiteDuration: number;
-	childSuites: jasmine.Suite[];
-	specs: jasmine.Spec[];
+	childSuites: ExtendedSuite[];
+	specs: SpecResults[];
 }
 
 export interface iTestResults extends iResults {
@@ -23,5 +26,5 @@ export type iSpecResults = {
 	fullname: string;
 	shortname: string;
 	duration: number;
-	failure: string[];
+	failure: {message: string, stack: any}[];
 }
