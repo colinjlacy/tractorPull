@@ -4,6 +4,8 @@ import { SpecResults } from './SpecResults';
 import { Options } from './Options';
 import { ExtendedSuite } from './ExtendedSuite';
 import { ExtendedSpec } from './ExtendedSpec';
+import { Validator } from './Validator';
+import { ElementLocation } from './ElementLocation';
 import { iSpecResults } from '../interfaces/results';
 import * as _ from 'lodash';
 import * as Jimp from 'jimp';
@@ -14,12 +16,14 @@ export class Reporter {
 	private suites: {[key: string]: ExtendedSuite}; // values will only ever be the extended suite object
 	private specs: {[key: string]: ExtendedSpec};
 	private runningSuite: ExtendedSuite; // will actually hold the extended suite object
+	private validator: Validator;
 
 	constructor(opts: Options) {
 		this.opts = opts;
 		this.suites = {};
 		this.specs = {};
 		this.runningSuite = null;
+		this.validator = new Validator(opts);
 	}
 
 	public getRunningSuite(): ExtendedSuite {
@@ -46,7 +50,7 @@ export class Reporter {
 
 	// returns spec clone
 	public getSpecClone(spec: jasmine.Spec): ExtendedSpec {
-		this.specs[spec.id] = Object.assign({}, this.specs[spec.id], spec);
+		this.specs[spec.id].extend(spec);
 		return this.specs[spec.id];
 	}
 
@@ -58,17 +62,19 @@ export class Reporter {
 
 	// returns suite clone
 	public getSuiteClone(suite: jasmine.Suite): ExtendedSuite {
-		this.suites[suite.id] = Object.assign({}, this.suites[suite.id], suite);
 		return this.suites[suite.id];
 	}
 
 	// write data into opts.dest as filename
-	public writeScreenshot(spec: any, data: any, filename: string): void {
+	public writeScreenshot(spec: ExtendedSpec, data: any, filename: string, width?: number, height?: number): void {
 		let imageBuffer = new Buffer(data, 'base64');
-		if(!!spec.getElement) {
+		if(!!spec.getElement()) {
 			Jimp.read(imageBuffer).then((image: Jimp.Jimp) => {
-				const element = spec.element;
-				image.crop(element.left, element.top, element.width, element.height);
+				if(width && height) image.scaleToFit(width, height);
+				const element = spec.getElement();
+				const elementLocation: ElementLocation = this.validator.stayWithinBounds(width, height, element);
+				console.log('[elementLocation]', elementLocation);
+				image.crop(elementLocation.getLeft(), elementLocation.getTop(), elementLocation.getWidth(), elementLocation.getHeight());
 				image.write(this.opts.getDest() + filename);
 			});
 		} else {
@@ -79,9 +85,9 @@ export class Reporter {
 	}
 
 	// returns duration in seconds
-	public getDuration(obj: any): number {
-		const started = obj.started;
-		const finished = obj.finished;
+	public getDuration(obj: ExtendedSpec | ExtendedSuite): number {
+		const started = obj.getStarted();
+		const finished = obj.getFinished();
 		if (!started || !finished) {
 			return 0;
 		}
@@ -89,50 +95,26 @@ export class Reporter {
 		return (duration < 1) ? duration : Math.round(duration);
 	}
 
-	public printSpec(spec: any): SpecResults {
-		if (spec.printed) {
-			return null;
-		}
-
-		spec.printed = true;
-
-		return new SpecResults(spec, this.getDuration(spec), this.printReasonsForFailure(spec));
-	}
-
-	public printResults(suite: any): SuiteResults {
-		var output: SuiteResults = new SuiteResults(suite.fullName, this.getDuration(suite));
-
-		const specs = suite.specs;
+	public printResults(suite: ExtendedSuite): SuiteResults {
+		var output: SuiteResults = new SuiteResults(suite.getFullName(), this.getDuration(suite));
+		const specs = suite.getSpecs();
 
 		specs.forEach((specOrig: any) => {
-			const spec: any = this.specs[specOrig.id];
-			output.addSpec(this.printSpec(spec));
-			if (spec.status === 'failed') {
+			const spec: ExtendedSpec = this.specs[specOrig.id];
+			output.addSpec(new SpecResults(spec, this.getDuration(spec), spec.getFailedExpectations()));
+			if (spec.getStatus() === 'failed') {
 				output.incrementSpecsFailed();
 			} else {
 				output.incrementSpecsPassed();
 			}
 		});
 
-		if (suite.suites.length > 0) {
-			suite.suites.forEach((childSuite: ExtendedSuite) => {
+		if (suite.getSuites().length > 0) {
+			suite.getSuites().forEach((childSuite: ExtendedSuite) => {
 				output.addChildSuite(this.printResults(childSuite));
 			});
 		}
 
 		return output;
 	}
-
-	public printReasonsForFailure(spec: any): {message: string, stack: any}[] {
-		if (spec.status !== 'failed') return null;
-
-		let reasons: {message: string, stack: any}[] = [];
-
-		spec.failedExpectations.forEach((exp: {message: string, stack: any}): void => {
-			reasons.push(exp);
-		});
-
-		return reasons;
-	}
-
 }

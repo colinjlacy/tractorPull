@@ -1,3 +1,4 @@
+import { ExtendedSpec } from './ExtendedSpec';
 
 export class SpecResults {
 	private status: string;
@@ -7,11 +8,11 @@ export class SpecResults {
 	private duration: number;
 	private failure: {message: string, stack: any}[];
 
-	constructor(spec: any, duration: number, reasonsForFailure: {message: string, stack: any}[]) {
-		this.status = spec.status;
-		this.link = "./screenshots/" + spec.filename;
-		this.fullname = spec.fullName;
-		this.shortname = spec.fullName.replace(spec.suite.getFullName(), '').trim();
+	constructor(spec: ExtendedSpec, duration: number, reasonsForFailure: {message: string, stack: any}[]) {
+		this.status = spec.getStatus();
+		this.link = "./screenshots/" + spec.getFilename();
+		this.fullname = spec.getSuite().getFullName() + ' ' ;
+		this.shortname = spec.getDescription();
 		this.duration = duration;
 		this.failure = reasonsForFailure;
 	}

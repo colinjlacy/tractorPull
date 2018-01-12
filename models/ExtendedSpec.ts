@@ -14,6 +14,7 @@ export class ExtendedSpec {
 	private suite: ExtendedSuite;
 	private printed: boolean;
 	private status: string;
+	private passedExpectations: any[];
 	private failedExpectations: {message: string, stack: any}[];
 
 	constructor(spec: jasmine.Spec, suite: ExtendedSuite) {
@@ -120,5 +121,12 @@ export class ExtendedSpec {
 
 	public setSuite(value:ExtendedSuite) {
 		this.suite = value;
+	}
+
+	public extend(spec: any): void {
+		this.failedExpectations = spec.passedExpectations;
+		this.failedExpectations = spec.failedExpectations;
+		this.status = spec.status;
+		this.element = spec.element
 	}
 }

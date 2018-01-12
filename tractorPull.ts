@@ -15,6 +15,9 @@ import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 const jasmine = require('jasmine');
 
+let width: number;
+let height: number;
+
 export class TractorPull {
 
 	public jasmineStarted: Function;
@@ -30,6 +33,13 @@ export class TractorPull {
 		const validator = new Validator(opts);
 
 		this.jasmineStarted = function(): void {
+
+			browser.executeScript('return screen').then((screen: any) =>{
+				width = screen.availWidth;
+				height = screen.availHeight;
+				browser.driver.manage().window().setSize(width, height);
+			});
+
 			mkdirp(opts.getDest(), function(err): void {
 				var files;
 
@@ -60,29 +70,29 @@ export class TractorPull {
 		};
 
 		this.suiteDone = function(suiteOrig: jasmine.Suite): void {
-			const suite = reporter.getSuiteClone(suiteOrig);
+			const suite: ExtendedSuite = reporter.getSuiteClone(suiteOrig);
 			suite.setFinished(Date.now());
 			reporter.setRunningSuite(suite.getParent());
 		};
 
 		this.specStarted = function(specOrig: jasmine.Spec): void {
 			const runningSuite = reporter.getRunningSuite();
-			const spec = reporter.setSpecClone(specOrig, runningSuite);
+			const spec: ExtendedSpec = reporter.setSpecClone(specOrig, runningSuite);
 			runningSuite.setSpecs([...runningSuite.getSpecs(), spec]);
 			reporter.setRunningSuite(runningSuite);
 		};
 
 		this.specDone = function(specOrig: jasmine.Spec): void {
-			const spec: any = reporter.getSpecClone(specOrig);
-			spec.finished = Date.now();
+			const spec: ExtendedSpec = reporter.getSpecClone(specOrig);
+			spec.setFinished(Date.now());
 
 			if (!validator.isSpecValid(spec)) {
-				spec.printed = true;
+				spec.setPrinted(true);
 				return;
 			}
 
 			browser.takeScreenshot().then((png) => {
-				reporter.writeScreenshot(spec, png, spec.filename);
+				reporter.writeScreenshot(spec, png, spec.getFilename(), width, height);
 			});
 		};
 
@@ -96,7 +106,6 @@ export class TractorPull {
 				if (!validator.hasValidSpecs(suite)) {
 					return;
 				}
-				console.log(suite);
 				var suiteResults: SuiteResults = reporter.printResults(suite);
 				output.addSuite(suiteResults);
 			});

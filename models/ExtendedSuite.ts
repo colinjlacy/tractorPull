@@ -25,6 +25,7 @@ export class ExtendedSuite {
 		this.env = orig.env;
 		this.id = orig.id;
 		this.parentSuite = orig.parentSuite;
+		this.fullName = parent ? `${parent.getFullName()} ${orig.description}}` : orig.description;
 		this.queue = orig.queue
 	}
 
