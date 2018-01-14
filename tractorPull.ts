@@ -10,7 +10,6 @@ import { Options } from './models/Options';
 import { Validator } from './models/Validator';
 import { iOptions } from './interfaces/options';
 import { browser, by, element } from 'protractor';
-import * as _ from 'lodash';
 import * as fs from 'fs';
 import * as mkdirp from 'mkdirp';
 const jasmine = require('jasmine');

@@ -3,6 +3,7 @@ const jasmine = require('jasmine');
 const hat = require('hat');
 
 export class ExtendedSpec {
+	private title: string;
 	private started: number;
 	private finished: number;
 	private filename: string;
@@ -20,11 +21,14 @@ export class ExtendedSpec {
 	constructor(spec: jasmine.Spec, suite: ExtendedSuite) {
 		this.started = Date.now();
 		this.filename = hat() + '.png';
-		this.description = spec.description;
 		this.env = spec.env;
 		this.id = spec.id;
 		this.suite = suite;
 		this.printed = false;
+	}
+
+	public getTitle(): string {
+		return this.title;
 	}
 
 	public getStatus():string {
@@ -127,6 +131,8 @@ export class ExtendedSpec {
 		this.failedExpectations = spec.passedExpectations;
 		this.failedExpectations = spec.failedExpectations;
 		this.status = spec.status;
-		this.element = spec.element
+		this.element = spec.element;
+		this.title = spec.title;
+		this.description = spec.description;
 	}
 }

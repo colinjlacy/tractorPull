@@ -3,16 +3,18 @@ import { ExtendedSpec } from './ExtendedSpec';
 export class SpecResults {
 	private status: string;
 	private link: string;
-	private fullname: string;
-	private shortname: string;
+	private thumb: string;
+	private title: string;
+	private description: string;
 	private duration: number;
 	private failure: {message: string, stack: any}[];
 
 	constructor(spec: ExtendedSpec, duration: number, reasonsForFailure: {message: string, stack: any}[]) {
 		this.status = spec.getStatus();
 		this.link = "./screenshots/" + spec.getFilename();
-		this.fullname = spec.getSuite().getFullName() + ' ' ;
-		this.shortname = spec.getDescription();
+		this.thumb = "./screenshots/thumbs/" + spec.getFilename();
+		this.title = spec.getTitle();
+		this.description = spec.getDescription();
 		this.duration = duration;
 		this.failure = reasonsForFailure;
 	}
@@ -25,12 +27,16 @@ export class SpecResults {
 		return this.link;
 	}
 
-	public getFullname():string {
-		return this.fullname;
+	public getThumb(): string {
+		return this.thumb;
 	}
 
-	public getShortname():string {
-		return this.shortname;
+	public getTitle():string {
+		return this.title;
+	}
+
+	public getDescription():string {
+		return this.description;
 	}
 
 	public getDuration():number {

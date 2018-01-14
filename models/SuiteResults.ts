@@ -1,9 +1,11 @@
 import { SpecResults } from './SpecResults';
 import { ExtendedSpec } from './ExtendedSpec';
 import { ExtendedSuite } from './ExtendedSuite';
+import * as _ from 'lodash';
 
 export class SuiteResults {
 	private suiteFullName: string;
+	private suiteKabobName: string;
 	private suiteDuration: number;
 	private childSuites: ExtendedSuite[];
 	private specs: SpecResults[];
@@ -13,6 +15,7 @@ export class SuiteResults {
 
 	public constructor(suiteFullName:string, suiteDuration:number) {
 		this.suiteFullName = suiteFullName;
+		this.suiteKabobName = _.kebabCase(this.suiteFullName);
 		this.suiteDuration = suiteDuration;
 		this.specs = [];
 		this.childSuites = [];
@@ -22,6 +25,10 @@ export class SuiteResults {
 
 	public getSuiteFullName():string {
 		return this.suiteFullName;
+	}
+
+	public getSuiteKebobName(): string {
+		return this.suiteKabobName;
 	}
 
 	public getSuiteDuration():number {
