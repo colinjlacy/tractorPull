@@ -75,12 +75,19 @@ export class Reporter {
 				const elementLocation: ElementLocation = this.validator.stayWithinBounds(width, height, element);
 				console.log('[elementLocation]', elementLocation);
 				image.crop(elementLocation.getLeft(), elementLocation.getTop(), elementLocation.getWidth(), elementLocation.getHeight());
+				const clone = image.clone();
+				clone.cover(100, 100);
 				image.write(this.opts.getDest() + filename);
+				clone.write(this.opts.getDest() + 'thumbs/' + filename);
 			});
 		} else {
-			var stream = fs.createWriteStream(this.opts.getDest() + filename);
-			stream.write(imageBuffer);
-			stream.end();
+			Jimp.read(imageBuffer).then((image: Jimp.Jimp) => {
+				image.cover(100, 100);
+				image.write(this.opts.getDest() + 'thumbs/' + filename);
+				const stream = fs.createWriteStream(this.opts.getDest() + filename);
+				stream.write(imageBuffer);
+				stream.end();
+			});
 		}
 	}
 

@@ -32,7 +32,9 @@ export class TractorPull {
 		const reporter: Reporter = new Reporter(opts);
 		const validator = new Validator(opts);
 
-		this.jasmineStarted = function(): void {
+		deleteFolderRecursive(opts.getDest());
+
+		this.jasmineStarted = (): void => {
 
 			browser.executeScript('return screen').then((screen: any) =>{
 				width = screen.availWidth;
@@ -40,21 +42,10 @@ export class TractorPull {
 				browser.driver.manage().window().setSize(width, height);
 			});
 
-			mkdirp(opts.getDest(), function(err): void {
-				var files;
-
+			mkdirp(opts.getDest(), (err): void => {
 				if(err) {
 					throw new Error('Could not create directory ' + opts.getDest());
 				}
-
-				files = fs.readdirSync(opts.getDest());
-
-				files.forEach((file) => {
-					var filepath = opts.getDest() + file;
-					if (fs.statSync(filepath).isFile()) {
-						fs.unlinkSync(filepath);
-					}
-				});
 			});
 		};
 
@@ -111,7 +102,14 @@ export class TractorPull {
 			});
 
 			const formattedDate: FormattedDate = new FormattedDate();
-			const report = new TemplateBuilder(formattedDate.getDate(), output.print()).getTemplate();
+			let report;
+
+			console.log('opts.getFileType()', opts.getFileType());
+			if(opts.getFileType().includes('html')) {
+				report = new TemplateBuilder(formattedDate.getDate(), output.print()).getTemplate();
+			} else {
+				report = JSON.stringify(output.print());
+			}
 
 			fs.writeFile(opts.getFilename(), report, {encoding: 'utf8'}, (err) => {
 				if(err){
@@ -123,5 +121,19 @@ export class TractorPull {
 			browser.driver.sleep(1500);
 		};
 
+	}
+}
+
+function deleteFolderRecursive(path: string) {
+	if (fs.existsSync(path)) {
+		fs.readdirSync(path).forEach(function(file){
+			const curPath: string = path + "/" + file;
+			if (fs.lstatSync(curPath).isDirectory()) {
+				deleteFolderRecursive(curPath);
+			} else { // delete file
+				fs.unlinkSync(curPath);
+			}
+		});
+		fs.rmdirSync(path);
 	}
 }

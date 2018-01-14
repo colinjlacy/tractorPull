@@ -6,10 +6,12 @@ export class Options {
 	private filename: string;
 	private ignoreSkippedSpecs: boolean;
 	private captureOnlyFailedSpecs: boolean;
+	private fileType: string;
 
 	constructor(init: iOptions) {
 		this.dest                       = init.dest || './results/screenshots/';
-		this.filename                   = init.filename || './results/report.html';
+		this.fileType					= '.' + init.fileType || '.html';
+		this.filename                   = init.filename || './results/report' + this.fileType;
 		this.ignoreSkippedSpecs         = init.ignoreSkippedSpecs || false;
 		this.captureOnlyFailedSpecs     = init.captureOnlyFailedSpecs || false;
 	}
@@ -28,5 +30,9 @@ export class Options {
 
 	public isCaptureOnlyFailedSpecs(): boolean {
 		return this.captureOnlyFailedSpecs;
+	}
+
+	public getFileType():string {
+		return this.fileType;
 	}
 }

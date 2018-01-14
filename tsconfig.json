@@ -10,7 +10,8 @@
         "declaration": true,
         "traceResolution": false,
         "target": "es6",
-        "outDir": "dist"
+        "outDir": "dist",
+        "alwaysStrict": false
     },
     "include": [
         "tractorPull.ts",
