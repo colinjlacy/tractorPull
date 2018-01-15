@@ -1,3 +1,6 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { Buffer} from 'buffer';
 import { TestResults } from '../models/TestResults';
 import { ExtendedSuite } from '../models/ExtendedSuite';
 import { ExtendedSpec } from '../models/ExtendedSpec';
@@ -5,6 +8,10 @@ import { SpecResults } from '../models/SpecResults';
 import { SuiteResults } from '../models/SuiteResults';
 
 export function setReportContent(data: TestResults) {
+
+	const buff: Buffer = fs.readFileSync(path.resolve(__dirname, '../', '../', 'assets', 'instrum-logo-light-gray-footer.png'));
+	const imgBase64: string = buff.toString('base64');
+
 	const suites = data.getSuites();
 
 	const templateStart: string = `
@@ -29,7 +36,7 @@ export function setReportContent(data: TestResults) {
 			panels += `
 			<li class="media mb-5">
 			  <div class="media-body">
-				<h5 class="mt-0 mb-1">${spec.getTitle()}</h5>
+				<h4 class="mt-0 mb-1">${spec.getTitle()}</h4>
 				${spec.getDescription()}
 			  </div>
 			  <a href="${spec.getLink()}" data-toggle="lightbox" data-gallery="example-gallery" data-title="${spec.getTitle()}">
@@ -48,7 +55,7 @@ export function setReportContent(data: TestResults) {
 		<div class="row">
 		  <div class="col-sm-12">
 			<h4 class="text-muted">Made with jazz hands by</h4>
-			<h1 class="text-muted text-capitalize display-4 font-weight-bold">Instrum</h1>
+			<img src="data:image/png;base64,${imgBase64}" width="215" alt="Instrum Software"/>
 		  </div>
 		</div>
 	  </div>

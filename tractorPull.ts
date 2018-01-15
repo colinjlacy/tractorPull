@@ -1,4 +1,3 @@
-
 import { Reporter } from './models/Reporter';
 import { TestResults } from './models/TestResults';
 import { SuiteResults } from './models/SuiteResults';
