@@ -102,9 +102,8 @@ export class TractorPull {
 			const formattedDate: FormattedDate = new FormattedDate();
 			let report;
 
-			console.log('opts.getFileType()', opts.getFileType());
 			if(opts.getFileType().includes('html')) {
-				report = new TemplateBuilder(formattedDate.getDate(), output.print()).getTemplate();
+				report = new TemplateBuilder(formattedDate.getDate(), output.print(), opts).getTemplate();
 			} else {
 				report = JSON.stringify(output.print());
 			}
