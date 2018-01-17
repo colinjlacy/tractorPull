@@ -5,6 +5,7 @@ import * as _ from 'lodash';
 
 export class SuiteResults {
 	private suiteFullName: string;
+	private suiteDescription: string;
 	private suiteKabobName: string;
 	private suiteDuration: number;
 	private childSuites: ExtendedSuite[];
@@ -13,8 +14,9 @@ export class SuiteResults {
 	private specsFailed: number;
 
 
-	public constructor(suiteFullName:string, suiteDuration:number) {
+	public constructor(suiteFullName:string, suiteDescription: string, suiteDuration:number) {
 		this.suiteFullName = suiteFullName;
+		this.suiteDescription = suiteDescription;
 		this.suiteKabobName = _.kebabCase(this.suiteFullName);
 		this.suiteDuration = suiteDuration;
 		this.specs = [];
@@ -25,6 +27,10 @@ export class SuiteResults {
 
 	public getSuiteFullName():string {
 		return this.suiteFullName;
+	}
+
+	public getSuiteDescription(): string {
+		return this.suiteDescription;
 	}
 
 	public getSuiteKebobName(): string {

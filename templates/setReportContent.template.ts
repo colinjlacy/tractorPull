@@ -31,7 +31,10 @@ export function setReportContent(data: TestResults) {
 
 	let panels: string = `<div class="col-sm-8 col-sm-9"><div class="tab-content" id="v-pills-tabContent">`;
 	suites.forEach((suite: SuiteResults, ind: number) => {
-		panels += `<div class="tab-pane fade  ${ind === 0 ? 'show active' : ''}" id="${suite.getSuiteKebobName()}" role="tabpanel" aria-labelledby="${suite.getSuiteKebobName()}-tab"><ul class="list-unstyled">`;
+		panels += `<div class="tab-pane fade  ${ind === 0 ? 'show active' : ''}" id="${suite.getSuiteKebobName()}" role="tabpanel" aria-labelledby="${suite.getSuiteKebobName()}-tab">
+		<h3 style="text-transform: none">${suite.getSuiteDescription()}</h3>
+		<hr/>
+		<ul class="list-unstyled">`;
 		suite.getSpecs().forEach((spec: SpecResults) => {
 			panels += `
 			<li class="media mb-5">

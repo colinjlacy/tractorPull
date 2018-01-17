@@ -16,16 +16,17 @@ export class ExtendedSuite {
 	private fullName: string;
 
 	constructor(orig: jasmine.Suite, parent?: ExtendedSuite) {
+		const [title, description] = orig.description.split('|||');
 		this.suites = [];
 		this.specs = [];
 		this.started = Date.now();
 		this.parent = parent;
 		this.printed = false;
-		this.description = orig.description;
+		this.description = description;
 		this.env = orig.env;
 		this.id = orig.id;
 		this.parentSuite = orig.parentSuite;
-		this.fullName = parent ? `${parent.getFullName()} ${orig.description}}` : orig.description;
+		this.fullName = title;
 		this.queue = orig.queue
 	}
 

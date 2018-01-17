@@ -102,7 +102,7 @@ export class Reporter {
 	}
 
 	public printResults(suite: ExtendedSuite): SuiteResults {
-		var output: SuiteResults = new SuiteResults(suite.getFullName(), this.getDuration(suite));
+		var output: SuiteResults = new SuiteResults(suite.getFullName(), suite.getDescription(), this.getDuration(suite));
 		const specs = suite.getSpecs();
 
 		specs.forEach((specOrig: any) => {

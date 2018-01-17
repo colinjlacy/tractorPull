@@ -16,6 +16,9 @@ const jasmine = require('jasmine');
 let width: number;
 let height: number;
 
+export { Guide } from './models/Guide';
+export { Step } from './models/Step';
+
 export class TractorPull {
 
 	public jasmineStarted: Function;
