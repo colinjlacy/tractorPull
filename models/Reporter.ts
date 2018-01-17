@@ -73,7 +73,6 @@ export class Reporter {
 				if(width && height) image.scaleToFit(width, height);
 				const element = spec.getElement();
 				const elementLocation: ElementLocation = this.validator.stayWithinBounds(width, height, element);
-				console.log('[elementLocation]', elementLocation);
 				image.crop(elementLocation.getLeft(), elementLocation.getTop(), elementLocation.getWidth(), elementLocation.getHeight());
 				const clone = image.clone();
 				clone.cover(100, 100);

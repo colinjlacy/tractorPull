@@ -43,8 +43,6 @@ export class Validator {
 		const revisedWidth = (element.left + element.width) < width ? element.width : width - revisedLeft;
 		const revisedHeight = (element.top + element.height) < height ? element.height : height - revisedTop;
 
-		console.log('revisedLeft',revisedLeft);
-
 		const finalLeft = revisedLeft > padding ? revisedLeft - padding : 0;
 		const finalTop = revisedTop > padding ? revisedTop - padding : 0;
 		const finalWidth = (width - revisedWidth + revisedLeft) > padding ? revisedWidth + (revisedLeft - finalLeft) + padding : width - revisedWidth + revisedLeft;

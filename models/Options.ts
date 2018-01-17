@@ -10,7 +10,7 @@ export class Options {
 	private fileType: string;
 
 	constructor(init: iOptions) {
-		this.dest                       = init.title || 'User Guides';
+		this.title                      = init.title || 'User Guides';
 		this.dest                       = init.dest || './results/screenshots/';
 		this.fileType					= '.' + init.fileType || '.html';
 		this.filename                   = init.filename || './results/report' + this.fileType;

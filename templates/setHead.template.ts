@@ -1,7 +1,6 @@
 import { Options } from '../models/Options';
 
 export function setHead(date: string, opts: Options) {
-	console.log(opts);
 	return '<!DOCTYPE html>' + `
 <head><title>${date}</title>
   <link rel="stylesheet" href="https://bootswatch.com/4/lux/bootstrap.min.css">
