@@ -14,7 +14,7 @@
         "alwaysStrict": false
     },
     "include": [
-        "tractorPull.ts",
+        "index.ts",
         "interfaces/**/*",
         "models/**/*",
         "templates/**/*"

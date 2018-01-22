@@ -13,30 +13,6 @@ export class Validator {
 		this.opts = opts;
 	}
 
-	public isSpecValid(spec: ExtendedSpec) {
-		// Don't screenshot skipped specs
-		var isSkipped = this.opts.isIgnoreSkippedSpecs() && spec.getStatus() === 'pending';
-		// Screenshot only for failed specs
-		var isIgnored = this.opts.isCaptureOnlyFailedSpecs() && spec.getStatus() !== 'failed';
-
-		return !isSkipped && !isIgnored;
-	}
-
-	public hasValidSpecs(suite: ExtendedSuite): boolean {
-		let validSuites: boolean = false;
-		let validSpecs: boolean = false;
-
-		if (suite.getSuites().length) {
-			validSuites = suite.getSuites().some((s: ExtendedSuite): boolean => this.hasValidSpecs(s));
-		}
-
-		if (suite.getSpecs().length) {
-			validSpecs = suite.getSpecs().some((s: ExtendedSpec): boolean => this.isSpecValid(s));
-		}
-
-		return !!validSuites || !!validSpecs;
-	}
-
 	public stayWithinBounds(width: number, height: number, element: {width: number, height: number, top: number, left: number}, padding: number = 60): ElementLocation {
 		const revisedLeft = element.left < width ? element.left : 0;
 		const revisedTop = element.top < height ? element.top : 0;

@@ -3,39 +3,28 @@ import { iOptions } from '../interfaces/options';
 export class Options {
 
 	private title: string;
-	private dest: string;
-	private filename: string;
+	private imagePath: string;
+	private fileName: string;
 	private ignoreSkippedSpecs: boolean;
-	private captureOnlyFailedSpecs: boolean;
 	private fileType: string;
 
 	constructor(init: iOptions) {
 		this.title                      = init.title || 'User Guides';
-		this.dest                       = init.dest || './results/screenshots/';
+		this.imagePath                  = init.imagePath || './results/screenshots/';
 		this.fileType					= '.' + init.fileType || '.html';
-		this.filename                   = init.filename || './results/report' + this.fileType;
-		this.ignoreSkippedSpecs         = init.ignoreSkippedSpecs || false;
-		this.captureOnlyFailedSpecs     = init.captureOnlyFailedSpecs || false;
+		this.fileName                   = init.fileName || './results/report' + this.fileType;
 	}
 
 	public getTitle(): string {
 		return this.title;
 	}
 
-	public getDest(): string {
-		return this.dest;
+	public getImagePath(): string {
+		return this.imagePath;
 	}
 
-	public getFilename(): string {
-		return this.filename;
-	}
-
-	public isIgnoreSkippedSpecs(): boolean {
-		return this.ignoreSkippedSpecs;
-	}
-
-	public isCaptureOnlyFailedSpecs(): boolean {
-		return this.captureOnlyFailedSpecs;
+	public getFileName(): string {
+		return this.fileName;
 	}
 
 	public getFileType():string {

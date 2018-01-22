@@ -6,7 +6,6 @@ import { ExtendedSuite } from './ExtendedSuite';
 import { ExtendedSpec } from './ExtendedSpec';
 import { Validator } from './Validator';
 import { ElementLocation } from './ElementLocation';
-import { iSpecResults } from '../interfaces/results';
 import * as _ from 'lodash';
 import * as Jimp from 'jimp';
 const jasmine = require('jasmine');
@@ -76,14 +75,14 @@ export class Reporter {
 				image.crop(elementLocation.getLeft(), elementLocation.getTop(), elementLocation.getWidth(), elementLocation.getHeight());
 				const clone = image.clone();
 				clone.cover(100, 100);
-				image.write(this.opts.getDest() + filename);
-				clone.write(this.opts.getDest() + 'thumbs/' + filename);
+				image.write(this.opts.getImagePath() + filename);
+				clone.write(this.opts.getImagePath() + 'thumbs/' + filename);
 			});
 		} else {
 			Jimp.read(imageBuffer).then((image: Jimp.Jimp) => {
 				image.cover(100, 100);
-				image.write(this.opts.getDest() + 'thumbs/' + filename);
-				const stream = fs.createWriteStream(this.opts.getDest() + filename);
+				image.write(this.opts.getImagePath() + 'thumbs/' + filename);
+				const stream = fs.createWriteStream(this.opts.getImagePath() + filename);
 				stream.write(imageBuffer);
 				stream.end();
 			});

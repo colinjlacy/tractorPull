@@ -58,7 +58,7 @@ export function setReportContent(data: TestResults) {
 		<div class="row">
 		  <div class="col-sm-12">
 			<h4 class="text-muted">Made with jazz hands by</h4>
-			<img src="data:image/png;base64,${imgBase64}" width="215" alt="Instrum Software"/>
+			<a href="https://instrum.io"><img src="data:image/png;base64,${imgBase64}" width="215" alt="Instrum Software"/></a>
 		  </div>
 		</div>
 	  </div>

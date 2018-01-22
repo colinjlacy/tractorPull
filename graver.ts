@@ -16,10 +16,7 @@ const jasmine = require('jasmine');
 let width: number;
 let height: number;
 
-export { Guide } from './models/Guide';
-export { Step } from './models/Step';
-
-export class TractorPull {
+export class Graver {
 
 	public jasmineStarted: Function;
 	public suiteStarted: Function;
@@ -33,7 +30,7 @@ export class TractorPull {
 		const reporter: Reporter = new Reporter(opts);
 		const validator = new Validator(opts);
 
-		deleteFolderRecursive(opts.getDest());
+		this.deleteFolderRecursive(opts.getImagePath());
 
 		this.jasmineStarted = (): void => {
 
@@ -43,9 +40,9 @@ export class TractorPull {
 				browser.driver.manage().window().setSize(width, height);
 			});
 
-			mkdirp(opts.getDest(), (err): void => {
+			mkdirp(opts.getImagePath(), (err): void => {
 				if(err) {
-					throw new Error('Could not create directory ' + opts.getDest());
+					throw new Error('Could not create directory ' + opts.getImagePath());
 				}
 			});
 		};
@@ -78,11 +75,6 @@ export class TractorPull {
 			const spec: ExtendedSpec = reporter.getSpecClone(specOrig);
 			spec.setFinished(Date.now());
 
-			if (!validator.isSpecValid(spec)) {
-				spec.setPrinted(true);
-				return;
-			}
-
 			browser.takeScreenshot().then((png) => {
 				reporter.writeScreenshot(spec, png, spec.getFilename(), width, height);
 			});
@@ -95,9 +87,6 @@ export class TractorPull {
 
 
 			(<any>Object).values(suites).forEach((suite: ExtendedSuite) => {
-				if (!validator.hasValidSpecs(suite)) {
-					return;
-				}
 				var suiteResults: SuiteResults = reporter.printResults(suite);
 				output.addSuite(suiteResults);
 			});
@@ -111,9 +100,9 @@ export class TractorPull {
 				report = JSON.stringify(output.print());
 			}
 
-			fs.writeFile(opts.getFilename(), report, {encoding: 'utf8'}, (err) => {
+			fs.writeFile(opts.getFileName(), report, {encoding: 'utf8'}, (err) => {
 				if(err){
-					console.error('Error writing to file:' + opts.getDest() + opts.getFilename());
+					console.error('Error writing to file:' + opts.getImagePath() + opts.getFileName());
 					throw err;
 				}
 			});
@@ -122,18 +111,19 @@ export class TractorPull {
 		};
 
 	}
-}
 
-function deleteFolderRecursive(path: string) {
-	if (fs.existsSync(path)) {
-		fs.readdirSync(path).forEach(function(file){
-			const curPath: string = path + "/" + file;
-			if (fs.lstatSync(curPath).isDirectory()) {
-				deleteFolderRecursive(curPath);
-			} else { // delete file
-				fs.unlinkSync(curPath);
-			}
-		});
-		fs.rmdirSync(path);
+	private deleteFolderRecursive(path: string) {
+		if (fs.existsSync(path)) {
+			fs.readdirSync(path).forEach((file) => {
+				const curPath: string = path + "/" + file;
+				if (fs.lstatSync(curPath).isDirectory()) {
+					this.deleteFolderRecursive(curPath);
+				} else { // delete file
+					fs.unlinkSync(curPath);
+				}
+			});
+			fs.rmdirSync(path);
+		}
 	}
 }
+

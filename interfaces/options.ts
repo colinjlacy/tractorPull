@@ -1,8 +1,6 @@
 export interface iOptions {
 	title?: string;
-	dest?: string;
-	filename?: string;
-	ignoreSkippedSpecs?: boolean;
-	captureOnlyFailedSpecs?: boolean;
+	imagePath?: string;
+	fileName?: string;
 	fileType?: string;
 }
